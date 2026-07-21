@@ -103,7 +103,7 @@
 
   b, strong { color: var(--bold); font-weight: 700; }
   /* man renders .I as underline in a terminal */
-  i, em, .arg {
+  i, em {
     color: var(--arg); font-style: normal;
     text-decoration: underline; text-underline-offset: 2px;
   }
@@ -115,7 +115,7 @@
   dl { margin: 0 0 0.95rem; }
   dt { color: var(--bold); font-weight: 700; margin-top: 0.7rem; }
   dt:first-child { margin-top: 0; }
-  dt .arg, dt i { font-weight: 400; }
+  dt i { font-weight: 400; }
   dd { margin: 0.1rem 0 0 7ch; }
   @media (max-width: 620px) { dd { margin-left: 2ch; } }
 
@@ -131,8 +131,6 @@
   }
   pre b { color: var(--bold); }
   pre .cmt { color: var(--dim); }
-  pre .ctl { color: var(--arg); font-weight: 700; text-decoration: none; }
-  pre .tex { color: var(--link); }
 
   /* ── tables, kept ASCII-ish ───────────────────────────────────── */
   .tblwrap { overflow-x: auto; margin: 0 0 0.95rem; }
@@ -151,13 +149,6 @@
     margin: 0 0 0.95rem 4ch;
     color: var(--fg);
   }
-  blockquote .attrib { color: var(--dim); }
-
-  ul { margin: 0 0 0.95rem; padding-left: 2.2ch; list-style: none; }
-  li { margin-bottom: 0.5rem; text-indent: -2.2ch; }
-  li::before { content: "\2022   "; color: var(--dim); }
-  li ul { margin-top: 0.5rem; }
-
   /* ── less(1) status bar ───────────────────────────────────────── */
   .status {
     position: fixed; left: 0; right: 0; bottom: 0;
@@ -264,57 +255,6 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
   <p>The program and the essay explaining it are not two artifacts kept in
   sync — they are one file. That is the whole of the idea; everything else is
   machinery in service of it.</p>
-</div>
-
-<h2 id="example">Example</h2>
-<div class="body">
-  <p>What a web actually looks like — the opening of
-  <a href="https://github.com/sjnam/gweb/blob/main/examples/seq.w">examples/seq.w</a>,
-  a tiny lazy-sequence library. Prose is TeX, code is Go, and
-  <b>@&lt;…@&gt;</b> names a chunk that is written out and explained
-  somewhere else:</p>
-<pre><span class="ctl">@*</span> Introduction.
-This example builds a tiny library of <span class="tex">{\it lazy sequences\/}</span> and uses it to
-print the first few even Fibonacci numbers. A sequence here is an
-<span class="tex">|iter.Seq[V]|</span>, which is just the function type <span class="tex">|func(yield func(V) bool)|</span>:
-a <span class="tex">{\it producer\/}</span> that hands each value to a <span class="tex">|yield|</span> callback and stops
-early if <span class="tex">|yield|</span> returns <span class="tex">|false|</span>.
-<span class="ctl">@c</span>
-<b>package</b> main
-
-<b>import</b> (
-	"fmt"
-	"iter"
-)
-
-<span class="ctl">@&lt;</span>The Fibonacci generator<span class="ctl">@&gt;</span>
-<span class="ctl">@&lt;</span>The <span class="tex">|Map|</span> combinator<span class="ctl">@&gt;</span>
-
-<b>func</b> main() {
-	<span class="ctl">@&lt;</span>Print the first even Fibonacci numbers<span class="ctl">@&gt;</span>
-}
-
-<span class="ctl">@*</span> A sequence is a closure.
-The Fibonacci numbers are an infinite sequence, so they could never be
-returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are no trouble at all.
-<span class="ctl">@&lt;</span>The Fibonacci generator<span class="ctl">@&gt;=</span>
-<b>func</b> fibs() iter.Seq[int] {
-	<b>return func</b>(yield <b>func</b>(int) bool) {
-		a, b := 0, 1
-		<b>for</b> yield(a) {
-			a, b = b, a+b
-		}
-	}
-}</pre>
-
-  <p>Notice that <b>main</b> is written before the things it calls exist, and
-  that each section is introduced by the paragraph that motivates it. The order
-  is the order of explanation. <b>gtangle</b> puts it back into the order Go
-  wants; you never have to think about that order while writing.</p>
-
-  <p>The result is a gofmt-clean <b>seq.go</b> on one side, and on the other a
-  PDF with an index, a list of section names, and every cross-reference
-  hyperlinked. The PDF is the side meant for human eyes.</p>
 </div>
 
 <h2 id="works">Works</h2>
