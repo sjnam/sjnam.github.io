@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gweb(1) — literate programming for Go</title>
+<meta name="description" content="GWEB — a literate programming system for the Go programming language, modeled closely on Knuth and Levy's CWEB.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
+<style>
+  :root {
+    --bg:        #0d0d0d;
+    --fg:        #c8c8c8;
+    --bold:      #ffffff;
+    --arg:       #d7a55b;
+    --link:      #6fb3d2;
+    --link-hov:  #9fd4ee;
+    --dim:       #6a6a6a;
+    --rule:      #2a2a2a;
+    --sel:       #33475b;
+    --statusbg:  #1c1c1c;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg:       #f7f5ef;
+      --fg:       #232323;
+      --bold:     #000000;
+      --arg:      #8a5a10;
+      --link:     #1a5f8a;
+      --link-hov: #0d3f5e;
+      --dim:      #7a7a72;
+      --rule:     #ddd8cc;
+      --sel:      #cfe0ee;
+      --statusbg: #e6e2d7;
+    }
+  }
+  :root[data-theme="light"] {
+    --bg:#f7f5ef; --fg:#232323; --bold:#000; --arg:#8a5a10;
+    --link:#1a5f8a; --link-hov:#0d3f5e; --dim:#7a7a72; --rule:#ddd8cc;
+    --sel:#cfe0ee; --statusbg:#e6e2d7;
+  }
+  :root[data-theme="dark"] {
+    --bg:#0d0d0d; --fg:#c8c8c8; --bold:#fff; --arg:#d7a55b;
+    --link:#6fb3d2; --link-hov:#9fd4ee; --dim:#6a6a6a; --rule:#2a2a2a;
+    --sel:#33475b; --statusbg:#1c1c1c;
+  }
+
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+                 "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0 1.25rem 4.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  ::selection { background: var(--sel); }
+
+  main { max-width: 82ch; margin: 0 auto; }
+
+  /* ── the man(1) running head / foot ───────────────────────────── */
+  .runhead {
+    display: flex; justify-content: space-between; gap: 1rem;
+    color: var(--bold); font-weight: 700;
+    white-space: nowrap; overflow: hidden;
+  }
+  .runhead span:nth-child(2) { font-weight: 400; color: var(--fg); }
+  .runhead.top    { padding-top: 2.5rem; }
+  .runhead.bottom { padding-top: 2rem; border-top: 1px solid var(--rule);
+                    margin-top: 2.5rem; }
+
+  /* ── the prompt that opened this page ─────────────────────────── */
+  .prompt {
+    color: var(--dim);
+    padding: 1.75rem 0 0.25rem;
+    user-select: none;
+  }
+  .prompt b { color: var(--fg); font-weight: 400; }
+  .cursor {
+    display: inline-block; width: 0.6em; height: 1em;
+    background: var(--fg); vertical-align: text-bottom;
+    animation: blink 1.15s steps(1) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+
+  /* ── man page sections ────────────────────────────────────────── */
+  h2 {
+    font-size: 1em; font-weight: 700; color: var(--bold);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin: 2.1rem 0 0.55rem;
+  }
+  h2:first-of-type { margin-top: 1.4rem; }
+
+  .body { padding-left: 7ch; }
+  @media (max-width: 620px) { .body { padding-left: 2ch; } body { font-size: 14px; } }
+
+  p { margin: 0 0 0.95rem; }
+  .body > *:last-child { margin-bottom: 0; }
+
+  b, strong { color: var(--bold); font-weight: 700; }
+  /* man renders .I as underline in a terminal */
+  i, em, .arg {
+    color: var(--arg); font-style: normal;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+
+  a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+  a:hover, a:focus { color: var(--link-hov); }
+
+  /* ── .TP tagged paragraphs ────────────────────────────────────── */
+  dl { margin: 0 0 0.95rem; }
+  dt { color: var(--bold); font-weight: 700; margin-top: 0.7rem; }
+  dt:first-child { margin-top: 0; }
+  dt .arg, dt i { font-weight: 400; }
+  dd { margin: 0.1rem 0 0 7ch; }
+  @media (max-width: 620px) { dd { margin-left: 2ch; } }
+
+  /* ── literal blocks (.EX/.EE) ─────────────────────────────────── */
+  pre {
+    margin: 0 0 0.95rem;
+    padding: 0.55rem 0.9rem;
+    overflow-x: auto;
+    border-left: 2px solid var(--rule);
+    color: var(--fg);
+    line-height: 1.45;
+    tab-size: 4;
+  }
+  pre b { color: var(--bold); }
+  pre .cmt { color: var(--dim); }
+  pre .ctl { color: var(--arg); font-weight: 700; text-decoration: none; }
+  pre .tex { color: var(--link); }
+
+  /* ── tables, kept ASCII-ish ───────────────────────────────────── */
+  .tblwrap { overflow-x: auto; margin: 0 0 0.95rem; }
+  table { border-collapse: collapse; font-size: 0.95em; min-width: 100%; }
+  th, td {
+    text-align: left; padding: 0.22rem 1.6rem 0.22rem 0;
+    vertical-align: top; white-space: nowrap;
+  }
+  td:last-child, th:last-child { white-space: normal; padding-right: 0; }
+  th { color: var(--bold); font-weight: 700; border-bottom: 1px solid var(--rule); }
+  tbody tr:first-child td { padding-top: 0.4rem; }
+  td code, td b { color: var(--bold); font-weight: 700; }
+
+  ul { margin: 0 0 0.95rem; padding-left: 2.2ch; list-style: none; }
+  li { margin-bottom: 0.5rem; text-indent: -2.2ch; }
+  li::before { content: "\2022   "; color: var(--dim); }
+  li ul { margin-top: 0.5rem; }
+
+  /* ── less(1) status bar ───────────────────────────────────────── */
+  .status {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: var(--statusbg); color: var(--fg);
+    border-top: 1px solid var(--rule);
+    padding: 0.3rem 1rem;
+    font-size: 0.85em; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    display: flex; justify-content: space-between; gap: 1rem;
+  }
+  .status .pct { color: var(--bold); font-weight: 700; }
+  .status button {
+    background: none; border: none; color: var(--link);
+    font: inherit; cursor: pointer; padding: 0;
+    text-decoration: underline; text-underline-offset: 2px;
+  }
+  .status button:hover { color: var(--link-hov); }
+</style>
+</head>
+<body>
+
+<main>
+
+<p class="prompt"><b>$</b> man gweb<span class="cursor" aria-hidden="true"></span></p>
+
+<div class="runhead top">
+  <span>GWEB(1)</span><span>General Commands Manual</span><span>GWEB(1)</span>
+</div>
+
+<h2 id="name">Name</h2>
+<div class="body">
+  <p><b>gweb</b> — literate programming for the Go programming language</p>
+  <p><b>gtangle</b>, <b>gweave</b> — translate GWEB to Go and/or TeX</p>
+</div>
+
+<h2 id="synopsis">Synopsis</h2>
+<div class="body">
+<pre><b>gtangle</b> [<b>-o</b> <span class="arg">dir</span>] <span class="arg">webfile</span>[<b>.w</b>] [<span class="arg">changefile</span>[<b>.ch</b>]]
+<b>gweave</b>  [<b>-o</b> <span class="arg">dir</span>] <span class="arg">webfile</span>[<b>.w</b>] [<span class="arg">changefile</span>[<b>.ch</b>]]</pre>
+</div>
+
+<h2 id="description">Description</h2>
+<div class="body">
+  <p><b>GWEB</b> is a
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/lp.html">literate
+  programming</a> system for Go, modeled closely on Donald Knuth and Silvio
+  Levy's <b>CWEB</b>. You write a single <b>.w</b> source file that interleaves
+  TeX documentation with Go code, and two tools read it in opposite directions —
+  exactly as <b>CWEB</b> does for C, with C replaced by Go.</p>
+
+  <div class="tblwrap">
+  <table>
+    <thead><tr><th>CWEB</th><th>GWEB</th><th>purpose</th></tr></thead>
+    <tbody>
+      <tr><td><b>ctangle</b></td><td><b>gtangle</b></td><td>extract compilable source (<b>.go</b>) for the machine</td></tr>
+      <tr><td><b>cweave</b></td><td><b>gweave</b></td><td>produce a typeset document (<b>.tex</b> → PDF) for people</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><b>gtangle</b> strips the documentation, reassembles the named code
+  sections in the order the Go compiler needs, runs <b>gofmt</b>(1) on the
+  result, and writes the <b>.go</b> files.</p>
+
+  <p><b>gweave</b> produces a TeX file in which reserved words are bold,
+  identifiers italic, strings typewriter, and named sections linked by number,
+  with a cross-referenced <i>index</i> and <i>list of refinements</i> generated
+  automatically. Declared <b>type</b> names are set bold and <b>const</b> names
+  typewriter; override any of it with <b>@f</b> / <b>@s</b>.</p>
+
+  <p>The program and the essay explaining it are not two artifacts kept in
+  sync — they are one file.</p>
+</div>
+
+<h2 id="prerequisites">Prerequisites</h2>
+<div class="body">
+  <p><b>GWEB</b> assumes you already know <b>Go</b> and are comfortable with
+  <b>TeX</b> — in particular <i>plain</i> TeX, since <b>gwebmac.tex</b> is plain
+  TeX, not LaTeX. Beyond that:</p>
+  <ul>
+    <li>A TeX distribution (<a href="https://tug.org/texlive/">TeX Live</a> or
+    MacTeX), providing the <b>tex</b>, <b>pdftex</b>, and <b>luatex</b>
+    engines.</li>
+    <li>For Korean output, the <b>Noto Serif/Sans CJK KR</b> fonts —
+    <b>kotexgweb.tex</b> selects them by name.</li>
+  </ul>
+</div>
+
+<h2 id="installation">Installation</h2>
+<div class="body">
+  <p><b>gtangle</b> installs the Go way, since its sources are committed:</p>
+<pre>go install github.com/sjnam/gweb/cmd/gtangle@latest</pre>
+
+  <p><b>gweave</b> is generated rather than committed — as in <b>CWEB</b>, only
+  the Go needed to bootstrap the tangler is in the repository — so install both
+  from a checkout:</p>
+<pre>git clone https://github.com/sjnam/gweb &amp;&amp; cd gweb
+make build                <span class="cmt"># bin/gtangle and bin/gweave</span>
+make test                 <span class="cmt"># the test suite</span>
+./install.sh              <span class="cmt"># commands + gwebmac.tex + man page</span></pre>
+
+  <p>Build through <b>make</b>, not a bare <b>go build ./...</b>, on a fresh
+  checkout: <b>make</b> builds <b>gtangle</b> from the committed sources, runs
+  it to tangle the rest, then builds <b>gweave</b>. The installer takes
+  <b>--prefix</b>, <b>--bindir</b>, <b>--mandir</b>, <b>--texmf</b>, and
+  <b>--uninstall</b>.</p>
+</div>
+
+<h2 id="usage">Usage</h2>
+<div class="body">
+<pre>gtangle foo.w     <span class="cmt"># -&gt; foo.go  (plus any @(file@&gt;= outputs)</span>
+gweave  foo.w     <span class="cmt"># -&gt; foo.tex</span>
+pdftex  foo.tex   <span class="cmt"># -&gt; foo.pdf (gwebmac.tex must be on TEXINPUTS)</span></pre>
+
+  <p>The <b>.w</b> extension may be omitted, as in <b>CWEB</b> — <b>gtangle
+  foo</b> reads <b>foo.w</b>, and a bare change-file name gets <b>.ch</b>. Each
+  command prints a brief cweb-style progress line, one <b>*</b><span
+  class="arg">N</span> per starred (chapter) section.</p>
+
+  <p>A second argument is a <i>change file</i>, which patches the master source
+  without editing it (<b>CWEB</b>'s <b>.ch</b> mechanism):</p>
+<pre>gtangle examples/wc.w examples/wc.ch   <span class="cmt"># a CSV variant of wc</span></pre>
+
+  <p>For a hyperlinked PDF you may also go through DVI, exactly as <b>CWEB</b>
+  does — request the <b>\special{pdf:…}</b> back end with <b>\let\pdf+</b>, then
+  convert:</p>
+<pre>tex "\let\pdf+ \input foo.tex"   <span class="cmt"># -&gt; foo.dvi (with pdf: specials)</span>
+dvipdfmx foo.dvi                 <span class="cmt"># -&gt; foo.pdf (links + bookmarks)</span></pre>
+
+  <p>The tangled Go always carries <b>//line</b> directives, so the compiler,
+  <b>go vet</b>, and panic traces report errors at <b>.w</b> positions instead
+  of <b>.go</b> ones — the Go counterpart of <b>CWEB</b>'s <b>#line</b>:</p>
+<pre>gtangle foo.w &amp;&amp; go build .      <span class="cmt"># an error reads  foo.w:42: ...</span></pre>
+</div>
+
+<h2 id="options">Options</h2>
+<div class="body">
+  <dl>
+    <dt><b>-o</b> <span class="arg">dir</span></dt>
+    <dd>Write output files to <i>dir</i> instead of the input file's directory.
+    For <b>gtangle</b>, the directory — and any subdirectories named by
+    <b>@(</b><span class="arg">file</span><b>@&gt;=</b> targets — is created if
+    necessary.</dd>
+    <dt><b>-version</b></dt>
+    <dd>Print the version and exit.</dd>
+  </dl>
+</div>
+
+<h2 id="example">Example</h2>
+<div class="body">
+  <p>A fragment of <a
+  href="https://github.com/sjnam/gweb/blob/main/examples/seq.w">examples/seq.w</a>,
+  a tiny lazy-sequence library. Prose is TeX, code is Go, and
+  <b>@&lt;…@&gt;</b> names a section that is spliced in elsewhere:</p>
+<pre><span class="tex">\def\title{Lazy Sequences in Go}</span>
+
+<span class="ctl">@s</span> Seq int
+
+<span class="ctl">@*</span> Introduction.
+This example builds a tiny library of <span class="tex">{\it lazy sequences\/}</span> and uses it to
+print the first few even Fibonacci numbers. A sequence here is an
+<span class="tex">|iter.Seq[V]|</span>, which is just the function type <span class="tex">|func(yield func(V) bool)|</span>:
+a <span class="tex">{\it producer\/}</span> that hands each value to a <span class="tex">|yield|</span> callback and stops
+early if <span class="tex">|yield|</span> returns <span class="tex">|false|</span>.
+<span class="ctl">@c</span>
+<b>package</b> main
+
+<b>import</b> (
+	"fmt"
+	"iter"
+)
+
+<span class="ctl">@&lt;</span>The Fibonacci generator<span class="ctl">@&gt;</span>
+<span class="ctl">@&lt;</span>The <span class="tex">|Map|</span> combinator<span class="ctl">@&gt;</span>
+
+<b>func</b> main() {
+	<span class="ctl">@&lt;</span>Print the first even Fibonacci numbers<span class="ctl">@&gt;</span>
+}
+
+<span class="ctl">@*</span> A sequence is a closure.
+The Fibonacci numbers are an infinite sequence, so they could never be
+returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are no trouble at all.
+<span class="ctl">@&lt;</span>The Fibonacci generator<span class="ctl">@&gt;=</span>
+<b>func</b> fibs() iter.Seq[int] {
+	<b>return func</b>(yield <b>func</b>(int) bool) {
+		a, b := 0, 1
+		<b>for</b> yield(a) {
+			a, b = b, a+b
+		}
+	}
+}</pre>
+  <p><b>gtangle seq.w</b> yields a gofmt-clean <b>seq.go</b>;
+  <b>gweave seq.w</b> yields <b>seq.tex</b>, which typesets into a
+  cross-referenced document with an index and a list of the section names.</p>
+</div>
+
+<h2 id="control-codes">Control codes</h2>
+<div class="body">
+  <p>Structural codes, which begin a part of the web:</p>
+  <div class="tblwrap">
+  <table>
+    <tbody>
+      <tr><td><b>@&nbsp;</b> <b>@\t</b> <b>@\n</b></td><td>begin a normal (unstarred) section</td></tr>
+      <tr><td><b>@*</b></td><td>begin a starred section (group/chapter); the title runs to the first <b>.</b></td></tr>
+      <tr><td><b>@*</b><span class="arg">N</span></td><td>begin a starred section at depth <i>N</i> (<b>@*0</b> == <b>@*</b>)</td></tr>
+      <tr><td><b>@c</b>, <b>@p</b></td><td>begin the code part of an <i>unnamed</i> section</td></tr>
+      <tr><td><b>@&lt;</b><span class="arg">name</span><b>@&gt;=</b></td><td>begin the code part of a <i>named</i> section (a "refinement")</td></tr>
+      <tr><td><b>@(</b><span class="arg">file</span><b>@&gt;=</b></td><td>begin code that <b>gtangle</b> writes to <i>file</i></td></tr>
+      <tr><td><b>@i</b> <span class="arg">file</span></td><td>include another <b>.w</b> file at this point</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>In-code codes:</p>
+  <div class="tblwrap">
+  <table>
+    <tbody>
+      <tr><td><b>@&lt;</b><span class="arg">name</span><b>@&gt;</b></td><td>reference to a named section — expanded by tangle, linked by weave</td></tr>
+      <tr><td><b>@=</b><span class="arg">text</span><b>@&gt;</b></td><td>verbatim text passed literally to the tangled Go</td></tr>
+      <tr><td><b>@t</b> <span class="arg">text</span><b>@&gt;</b></td><td>TeX text inserted into the woven code (ignored by tangle)</td></tr>
+      <tr><td><b>@&amp;</b></td><td>paste: join the surrounding tokens with no space</td></tr>
+      <tr><td><b>@@</b></td><td>a literal <b>@</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Layout and index codes, read by <b>gweave</b> and ignored by
+  <b>gtangle</b>:</p>
+  <div class="tblwrap">
+  <table>
+    <tbody>
+      <tr><td><b>@,</b></td><td>insert a thin space</td></tr>
+      <tr><td><b>@/</b></td><td>force a line break, continuing at the same indentation</td></tr>
+      <tr><td><b>@|</b></td><td>an optional line break — a place a long line may wrap</td></tr>
+      <tr><td><b>@#</b></td><td>a line break followed by a blank line</td></tr>
+      <tr><td><b>@f</b> <span class="arg">a</span> <span class="arg">b</span></td><td>format identifier <i>a</i> like identifier or keyword <i>b</i></td></tr>
+      <tr><td><b>@s</b> <span class="arg">a</span> <span class="arg">b</span></td><td>like <b>@f</b>, but omit the entry from the index</td></tr>
+      <tr><td><b>@!</b></td><td>index the next identifier as a definition (underline it)</td></tr>
+      <tr><td><b>@^</b><span class="arg">text</span><b>@&gt;</b></td><td>index entry, typeset in roman</td></tr>
+      <tr><td><b>@.</b><span class="arg">text</span><b>@&gt;</b></td><td>index entry, typeset in typewriter</td></tr>
+      <tr><td><b>@:</b><span class="arg">text</span><b>@&gt;</b></td><td>index entry, typeset by the user macro <b>\9</b></td></tr>
+      <tr><td><b>@%</b></td><td>the rest of the line is a comment in the <b>.w</b> file</td></tr>
+      <tr><td><b>@q</b> <span class="arg">text</span><b>@&gt;</b></td><td>quoted material — a comment for the web author</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Inline code inside prose is written between vertical bars, as
+  <b>|identifier|</b>. Section names may be abbreviated with a trailing
+  <b>...</b> once the full name has appeared. The full reference is in
+  <a href="https://github.com/sjnam/gweb/blob/main/format.md">format.md</a>.</p>
+</div>
+
+<h2 id="notes-on-go">Notes specific to Go</h2>
+<div class="body">
+  <ul>
+    <li>Go has no preprocessor, so <b>@d</b> never tangles to code —
+    <b>gtangle</b> ignores it. <b>gweave</b>, however, reads <b>@d</b>
+    <span class="arg">Name</span> as a request to set <i>Name</i> in typewriter,
+    like a <b>CWEB</b> macro; useful for constants you do not declare in this
+    web, e.g. <b>@d http.StatusOK</b>.</li>
+    <li><b>gweave</b> classifies declared names automatically: a <b>type</b>
+    name is set bold, like a predeclared type, and a <b>const</b> name is set in
+    typewriter — the treatment <b>cweave</b> gives names defined by <b>@d</b>,
+    since a Go <b>const</b> is the closest analogue. Both the single and
+    parenthesized-block declaration forms are recognized.</li>
+    <li><b>@f MyType int</b> sets a user type in bold; <b>@f Name x</b> overrides
+    the automatic classification back to plain italic. These apply globally and
+    may appear in limbo or in a section's definition part.</li>
+    <li>The default tangled output is <span class="arg">basename</span><b>.go</b>;
+    additional files come from <b>@(</b><span class="arg">file</span><b>@&gt;=</b>,
+    so one web can emit several files — including a <b>go.mod</b> or a
+    <b>_test.go</b>.</li>
+  </ul>
+</div>
+
+<h2 id="localization">Localization</h2>
+<div class="body">
+  <p>The woven output can be written in Korean by processing it with
+  <b>luatex</b> rather than <b>pdftex</b> and putting one line in the
+  <b>.w</b> file's limbo:</p>
+<pre><span class="tex">\input kotexgweb</span></pre>
+  <p><b>kotexgweb.tex</b> loads
+  <a href="https://ctan.org/pkg/luatexko">luatexko</a>, selects the Noto
+  Serif/Sans CJK KR fonts, translates gweave's fixed wording into Korean, and
+  supplies a LuaTeX PDF back end so that blue cross-reference links and the
+  bookmark pane work with Korean titles.</p>
+  <p><b>gweave</b> needs no flag for this. All the human-readable text it emits
+  goes through macros — <b>\GU</b>, <b>\GNused</b>, <b>\Gsectionword</b>, … —
+  that <b>kotexgweb.tex</b> overrides, so the same mechanism localizes to any
+  language: write your own <b>\input</b> file modelled on it.</p>
+</div>
+
+<h2 id="files">Files</h2>
+<div class="body">
+  <dl>
+    <dt><i>gwebmac.tex</i></dt>
+    <dd>The TeX macros <b>\input</b> in the first line of every <b>gweave</b>
+    output file — the analogue of <b>CWEB</b>'s <i>cwebmac.tex</i>.
+    <b>gweave</b> supplies that line itself, so the <b>.w</b> file need
+    not.</dd>
+    <dt><i>kotexgweb.tex</i></dt>
+    <dd>Korean localization: fonts, wording, and the LuaTeX PDF back end.</dd>
+    <dt><i>gwebman.tex</i></dt>
+    <dd>The GWEB user manual (<b>make manual</b>), together with the <b>.w</b>
+    file-format reference in <i>format.md</i>.</dd>
+    <dt><i>gweb.1</i></dt>
+    <dd>The man page for both commands. After <b>./install.sh</b>, <b>man
+    gtangle</b> and <b>man gweave</b> describe them.</dd>
+    <dt><b>TEXINPUTS</b></dt>
+    <dd>Point this at a directory holding <i>gwebmac.tex</i>, or copy the file
+    next to your document. The installer places it in your TeX tree, so this is
+    not normally needed. See <b>tex</b>(1) for the details of the
+    searching.</dd>
+  </dl>
+</div>
+
+<h2 id="design-notes">Design notes and limitations</h2>
+<div class="body">
+  <ul>
+    <li><b>Lexing for free.</b> Tangle relies on <b>gofmt</b>
+    (<b>go/format</b>) to canonicalize the assembled program, so the emitted Go
+    is always tidily formatted as long as the web assembles into valid Go.</li>
+    <li><b>Pretty-printing by mirroring.</b> <b>gweave</b> mirrors the source's
+    own spacing rather than re-deriving layout from a full Go grammar the way
+    <b>cweave</b> does for C. Because gofmt-formatted Go already encodes the
+    grammar in its spacing, mirroring it reproduces gofmt exactly — including
+    the tricky cases (<b>*T</b> vs <b>a * b</b>, <b>[]T</b> vs <b>a[i]</b>,
+    precedence spacing like <b>a*b + c</b>) — without any parsing. Write the
+    code in your sections in gofmt style for the best-looking output.</li>
+    <li><b>Definition detection</b> in the index is heuristic — an identifier
+    following <b>func</b>/<b>var</b>/<b>const</b>/<b>type</b>, or just left of
+    <b>:=</b> — not a full type check.</li>
+    <li><b>Diagnostics.</b> Both tools report, with <i>file:line</i> locations,
+    unterminated control codes, references to undefined sections, ambiguous
+    <b>...</b> abbreviations, and named sections defined but never used. These
+    are warnings; <b>gtangle</b> still stops if it must actually expand an
+    undefined reference. An origin map kept in step through <b>@i</b> includes
+    and change-file edits makes every location point back to the file and line
+    you actually wrote.</li>
+    <li><b>Page layout follows cweave.</b> <b>gwebmac.tex</b> gives the woven
+    document the same furniture <b>CWEB</b> produces: run-in bold section
+    headings with a page break before each starred section, <b>§sec JOBNAME …
+    GROUPTITLE page</b> running heads, a two-column index under your own
+    <b>@* Index.</b> section, a <i>Names of the Sections</i> list, and a
+    contents page with dotted leaders. As in <b>CWEB</b>, the contents page is
+    produced at the <i>end</i> in a single TeX pass; move it to the front when
+    binding if you prefer.</li>
+    <li><b>Hyperlinks and bookmarks.</b> Every section number shown as a
+    reference, in the index, or on the contents page is a blue link to that
+    section. Starred sections also become a PDF outline, nested by their
+    <b>@*</b>, <b>@*1</b>, <b>@*2</b> depths. <b>pdftex</b> and <b>luatex</b> in
+    PDF mode use the engine's own primitives; the DVI route emits
+    <b>\special{pdf:…}</b> for <b>dvipdfmx</b> when you ask with
+    <b>\let\pdf+</b>. With a plain DVI engine and no <b>\let\pdf+</b>, links and
+    bookmarks are simply omitted.</li>
+    <li><b>Self-hosting.</b> GWEB tangles its own sources the same way, so
+    editing a <b>.w</b> reshuffles the line numbers in the bootstrap Go it
+    commits — the price of keeping the generated code honest about its literate
+    origin.</li>
+  </ul>
+</div>
+
+<h2 id="repositories">Repositories</h2>
+<div class="body">
+  <dl>
+    <dt><a href="https://github.com/sjnam/gweb">sjnam/gweb</a></dt>
+    <dd>The system itself: <b>gtangle</b>, <b>gweave</b>, <b>gwebmac.tex</b>,
+    <b>kotexgweb.tex</b>, the manual, the format reference, an installer, and VS
+    Code language support for <b>.w</b> files. MIT licensed.</dd>
+
+    <dt><a href="https://github.com/sjnam/gweb-examples">sjnam/gweb-examples</a></dt>
+    <dd>Thirty-odd standalone literate Go programs — algorithms and data
+    structures (<b>ntt.w</b>, <b>ziptree.w</b>, <b>suffixautomaton.w</b>,
+    <b>runningmedian.w</b>), concurrency (<b>fast_cancel.w</b>, <b>pmap.w</b>,
+    <b>pipeline.w</b>, <b>squint.w</b>), and contest solutions from HackerRank,
+    Codeforces, LeetCode, Library Checker, and Project Euler. Plus two curated
+    collections that work a single technique across several problems:
+    <b>cdq-dc/</b> (CDQ divide and conquer) and <b>cht/</b> (the convex hull
+    trick). Many are Korean essays; several carry MetaPost figures.</dd>
+  </dl>
+
+  <p>Other programs written in GWEB:</p>
+  <dl>
+    <dt><a href="https://github.com/sjnam/go-sgb">sjnam/go-sgb</a></dt>
+    <dd>Knuth's <i>Stanford GraphBase</i>, rewritten in GWEB.</dd>
+    <dt><a href="https://github.com/sjnam/dancing-cells">sjnam/dancing-cells</a></dt>
+    <dd>The exact-cover solver with item multiplicities and colors, using
+    sparse-set "dancing cells" data structures and binary branching.</dd>
+    <dt><a href="https://github.com/sjnam/elliptic">sjnam/elliptic</a></dt>
+    <dd>A traveller's notes on elliptic curves.</dd>
+    <dt><a href="https://github.com/sjnam/life-game">sjnam/life-game</a></dt>
+    <dd>Conway's Game of Life.</dd>
+    <dt><a href="https://github.com/sjnam/guitar-tuner">sjnam/guitar-tuner</a></dt>
+    <dd>A guitar tuner.</dd>
+    <dt><a href="https://github.com/sjnam/bohnanza">sjnam/bohnanza</a></dt>
+    <dd>The bean-trading card game.</dd>
+    <dt><a href="https://github.com/sjnam/go-advent">sjnam/go-advent</a></dt>
+    <dd>Advent of Code, literately.</dd>
+  </dl>
+
+  <p>Start with the PDF a <b>.w</b> weaves into; that is the side meant for
+  human eyes.</p>
+</div>
+
+<h2 id="see-also">See also</h2>
+<div class="body">
+  <p><b>gofmt</b>(1), <b>pdftex</b>(1), <b>dvipdfmx</b>(1), <b>tex</b>(1)</p>
+  <p><b>ctangle</b>(1), <b>cweave</b>(1),
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/cweb.html"><b>cweb</b>(1)</a>
+  — the C system GWEB is modeled on.</p>
+  <p>D. E. Knuth, <a
+  href="https://www-cs-faculty.stanford.edu/~knuth/lp.html"><i>Literate
+  Programming</i></a>, CSLI Lecture Notes 27 (1992).</p>
+</div>
+
+<h2 id="authors">Authors</h2>
+<div class="body">
+  <p>Don Knuth wrote WEB for TeX and Pascal. Silvio Levy designed and developed
+  CWEB by adapting the WEB conventions to C; Knuth began using CWEB and made
+  further refinements.</p>
+  <p>GWEB adapts those conventions to Go and is maintained by
+  <a href="https://github.com/sjnam">sjnam</a>.</p>
+</div>
+
+<h2 id="copyright">Copyright</h2>
+<div class="body">
+  <p>GWEB is released under the
+  <a href="https://github.com/sjnam/gweb/blob/main/LICENSE">MIT License</a>.</p>
+</div>
+
+<div class="runhead bottom">
+  <span>GWEB</span><span>2026-07-21</span><span>GWEB(1)</span>
+</div>
+
+</main>
+
+<div class="status">
+  <span>Manual page gweb(1) line 1 (press h for help or q to quit)</span>
+  <span><span class="pct" id="pct">0%</span> · <button id="theme" type="button">invert</button></span>
+</div>
+
+<script>
+(function () {
+  var pct = document.getElementById('pct');
+  function update() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var p = max > 0 ? Math.round(h.scrollTop / max * 100) : 100;
+    pct.textContent = p >= 100 ? 'END' : p + '%';
+  }
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+
+  var btn = document.getElementById('theme');
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem('gweb-theme'); } catch (e) {}
+  if (saved) root.setAttribute('data-theme', saved);
+
+  function prefersDark() {
+    return matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  btn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme') || (prefersDark() ? 'dark' : 'light');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('gweb-theme', next); } catch (e) {}
+  });
+
+  // q — as in less(1)
+  addEventListener('keydown', function (e) {
+    if (e.key === 'q' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
