@@ -378,7 +378,8 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
 <div class="body">
   <dl>
     <dt>Mail</dt>
-    <dd><a href="mailto:jsunam@gmail.com">jsunam@gmail.com</a></dd>
+    <dd><a id="mail" data-m="anN1bmFtQGdtYWlsLmNvbQ=="
+           href="https://github.com/sjnam">jsunam at gmail dot com</a></dd>
     <dt>Code</dt>
     <dd><a href="https://github.com/sjnam">github.com/sjnam</a></dd>
   </dl>
@@ -437,6 +438,19 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
     root.setAttribute('data-theme', next);
     try { localStorage.setItem('gweb-theme', next); } catch (e) {}
   });
+
+  // Assemble the address at run time, so it is not sitting in the
+  // source for a harvester to regex out. Without JS the link still
+  // works — it just points at GitHub, and the text spells the address.
+  var mail = document.getElementById('mail');
+  if (mail) {
+    try {
+      var addr = atob(mail.getAttribute('data-m'));
+      mail.href = 'mailto:' + addr;
+      mail.textContent = addr;
+      mail.removeAttribute('data-m');
+    } catch (e) {}
+  }
 
   // q — as in less(1)
   addEventListener('keydown', function (e) {
