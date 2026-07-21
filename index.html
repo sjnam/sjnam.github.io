@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>gweb(7) — literate programming for Go</title>
-<meta name="description" content="GWEB — a literate programming system for the Go programming language, modeled closely on Knuth and Levy's CWEB. An introduction.">
+<title>Soojin Nam's Home Page</title>
+<meta name="description" content="Soojin Nam — author of GWEB, a literate programming system for Go modeled closely on Knuth and Levy's CWEB.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
 <style>
   :root {
@@ -146,6 +146,13 @@
   tbody tr:first-child td { padding-top: 0.4rem; }
   td code, td b { color: var(--bold); font-weight: 700; }
 
+  /* ── quoted matter, indented as man indents a display ─────────── */
+  blockquote {
+    margin: 0 0 0.95rem 4ch;
+    color: var(--fg);
+  }
+  blockquote .attrib { color: var(--dim); }
+
   ul { margin: 0 0 0.95rem; padding-left: 2.2ch; list-style: none; }
   li { margin-bottom: 0.5rem; text-indent: -2.2ch; }
   li::before { content: "\2022   "; color: var(--dim); }
@@ -177,7 +184,7 @@
 <p class="prompt"><b>$</b> man 7 gweb<span class="cursor" aria-hidden="true"></span></p>
 
 <div class="runhead top">
-  <span>GWEB(7)</span><span>Miscellaneous Information Manual</span><span>GWEB(7)</span>
+  <span>GWEB(7)</span><span>Soojin Nam's Home Page</span><span>GWEB(7)</span>
 </div>
 
 <h2 id="name">Name</h2>
@@ -378,13 +385,52 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
   Programming</i></a>, CSLI Lecture Notes 27 (1992).</p>
 </div>
 
-<h2 id="authors">Authors</h2>
+<h2 id="history">History</h2>
 <div class="body">
   <p>Don Knuth wrote WEB for TeX and Pascal. Silvio Levy designed and developed
   CWEB by adapting the WEB conventions to C; Knuth began using CWEB and made
-  further refinements.</p>
-  <p>GWEB adapts those conventions to Go and is maintained by
-  <a href="https://github.com/sjnam">sjnam</a>.</p>
+  further refinements. GWEB adapts those same conventions to Go.</p>
+</div>
+
+<h2 id="author">Author</h2>
+<div class="body">
+  <p><b>Soojin Nam</b> — <a href="https://github.com/sjnam">github.com/sjnam</a></p>
+
+  <p>Fond enough of literate programming to build a system for it. Go had no
+  WEB of its own, and doing without one seemed worse than writing one — so
+  GWEB exists, and nearly everything else linked from this page was written
+  with it.</p>
+
+  <p>A devoted reader of Donald Knuth, and the holder of several checks drawn
+  on the
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/boss.html">Bank of San
+  Serriffe</a> — the reward Knuth sends to anyone who finds an error in his
+  work.</p>
+
+  <p>One of those errors was in <b>SPIDERS</b>, Knuth's implementation of the
+  constrained Gray-sequence algorithms of Knuth and Ruskey — <i>spider
+  squishing</i>, as the paper cheerfully calls it. The recurrences were wrong.
+  The corrected code now stands in
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/spiders.w">spiders.w</a>,
+  where the credit reads:</p>
+
+  <blockquote>
+    <p>The code here is due to Soojin Nam, who kindly pointed out in 2026 that
+    my original recurrences were fatally flawed.</p>
+  </blockquote>
+
+  <p>Knuth's
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/news.html">news page</a>
+  put it more warmly:</p>
+
+  <blockquote>
+    <p>However, my Korean friend Soojin Nam has just reported that the original
+    program contained a serious bug — which he discovered with the help of
+    Claude!</p>
+  </blockquote>
+
+  <p>The bug report, and a faithful Go implementation of the paper, are in
+  <a href="https://github.com/sjnam/spider">sjnam/spider</a>.</p>
 </div>
 
 <h2 id="copyright">Copyright</h2>
