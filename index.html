@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Soojin Nam's Home Page</title>
-<meta name="description" content="Soojin Nam — author of GWEB, a literate programming system for Go modeled closely on Knuth and Levy's CWEB.">
+<meta name="description" content="Soojin Nam — literate programmer, author of GWEB, credited by Donald Knuth in spiders.w.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
 <style>
   :root {
@@ -181,30 +181,69 @@
 
 <main>
 
-<p class="prompt"><b>$</b> man 7 gweb<span class="cursor" aria-hidden="true"></span></p>
+<p class="prompt"><b>$</b> man 7 sjnam<span class="cursor" aria-hidden="true"></span></p>
 
 <div class="runhead top">
-  <span>GWEB(7)</span><span>Soojin Nam's Home Page</span><span>GWEB(7)</span>
+  <span>SJNAM(7)</span><span>Soojin Nam's Home Page</span><span>SJNAM(7)</span>
 </div>
 
 <h2 id="name">Name</h2>
 <div class="body">
-  <p><b>gweb</b> — literate programming for Go</p>
-</div>
-
-<h2 id="synopsis">Synopsis</h2>
-<div class="body">
-<pre>foo.w  <span class="cmt">--[</span> <b>gtangle</b> <span class="cmt">]--&gt;</span>  foo.go                     <span class="cmt">for the machine</span>
-foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</span>  foo.tex  <span class="cmt">--&gt;</span>  foo.pdf     <span class="cmt">for people</span></pre>
-  <p>One source file. Two readings of it.</p>
+  <p><b>sjnam</b> — Soojin Nam, literate programmer</p>
 </div>
 
 <h2 id="description">Description</h2>
 <div class="body">
+  <p><b>Soojin Nam</b> — <a href="https://github.com/sjnam">github.com/sjnam</a></p>
+
+  <p>Fond enough of literate programming to build a system for it. Go had no
+  WEB of its own, and doing without one seemed worse than writing one — so
+  <b>GWEB</b> exists, and nearly everything else on this page was written with
+  it.</p>
+
+  <p>A devoted reader of Donald Knuth, and the holder of several checks drawn
+  on the
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/boss.html">Bank of San
+  Serriffe</a> — the reward Knuth sends to anyone who finds an error in his
+  work.</p>
+
+  <p>One of those errors was in <b>SPIDERS</b>, Knuth's implementation of the
+  constrained Gray-sequence algorithms of Knuth and Ruskey — <i>spider
+  squishing</i>, as the paper cheerfully calls it. The recurrences were wrong.
+  The corrected code now stands in
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/spiders.w">spiders.w</a>,
+  where the credit reads:</p>
+
+  <blockquote>
+    <p>The code here is due to Soojin Nam, who kindly pointed out in 2026 that
+    my original recurrences were fatally flawed.</p>
+  </blockquote>
+
+  <p>Knuth's
+  <a href="https://www-cs-faculty.stanford.edu/~knuth/news.html">news page</a>
+  put it more warmly:</p>
+
+  <blockquote>
+    <p>However, my Korean friend Soojin Nam has just reported that the original
+    program contained a serious bug — which he discovered with the help of
+    Claude!</p>
+  </blockquote>
+
+  <p>The bug report, and a faithful Go implementation of the paper, are in
+  <a href="https://github.com/sjnam/spider">sjnam/spider</a>.</p>
+</div>
+
+<h2 id="gweb">GWEB</h2>
+<div class="body">
+<pre>foo.w  <span class="cmt">--[</span> <b>gtangle</b> <span class="cmt">]--&gt;</span>  foo.go                     <span class="cmt">for the machine</span>
+foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</span>  foo.tex  <span class="cmt">--&gt;</span>  foo.pdf     <span class="cmt">for people</span></pre>
+
+  <p>One source file. Two readings of it.</p>
+
   <p><b>GWEB</b> is a
   <a href="https://www-cs-faculty.stanford.edu/~knuth/lp.html">literate
-  programming</a> system for Go, modeled closely on Donald Knuth and Silvio
-  Levy's <b>CWEB</b>.</p>
+  programming</a> system for Go, modeled closely on Knuth and Levy's
+  <b>CWEB</b>.</p>
 
   <p>The premise, which is Knuth's, is that a program is a piece of writing
   addressed to human beings, and only incidentally something a compiler
@@ -225,17 +264,11 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
   <p>The program and the essay explaining it are not two artifacts kept in
   sync — they are one file. That is the whole of the idea; everything else is
   machinery in service of it.</p>
-
-  <p>GWEB is <b>CWEB</b> with C replaced by Go, deliberately and almost
-  line for line: <b>gtangle</b> is the analogue of <b>ctangle</b>(1),
-  <b>gweave</b> of <b>cweave</b>(1), and <b>gwebmac.tex</b> of
-  <i>cwebmac.tex</i>. If you have read a woven CWEB document, you already know
-  how to read a woven GWEB one.</p>
 </div>
 
 <h2 id="example">Example</h2>
 <div class="body">
-  <p>Here is what a web actually looks like — the opening of
+  <p>What a web actually looks like — the opening of
   <a href="https://github.com/sjnam/gweb/blob/main/examples/seq.w">examples/seq.w</a>,
   a tiny lazy-sequence library. Prose is TeX, code is Go, and
   <b>@&lt;…@&gt;</b> names a chunk that is written out and explained
@@ -284,71 +317,29 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
   hyperlinked. The PDF is the side meant for human eyes.</p>
 </div>
 
-<h2 id="notes">Notes</h2>
-<div class="body">
-  <p>A few things about GWEB that may not be obvious:</p>
-  <ul>
-    <li><b>Lexing comes for free.</b> Tangle hands the assembled program to
-    <b>gofmt</b> (<b>go/format</b>), so the emitted Go is canonically formatted
-    as long as the web assembles into valid Go at all.</li>
-
-    <li><b>Weave mirrors gofmt instead of parsing Go.</b> Where <b>cweave</b>
-    re-derives C's layout from a grammar, <b>gweave</b> simply mirrors the
-    source's own spacing — and because gofmt-formatted Go already encodes the
-    grammar in that spacing, mirroring reproduces gofmt exactly, down to
-    the tricky cases (<b>*T</b> vs <b>a * b</b>, <b>[]T</b> vs <b>a[i]</b>,
-    precedence spacing like <b>a*b + c</b>) without any parsing at all.</li>
-
-    <li><b>Errors point at the .w, not the .go.</b> The tangled
-    output always carries <b>//line</b> directives, so the compiler,
-    <b>go vet</b>, and panic traces all report positions in the file you
-    actually wrote — the Go counterpart of CWEB's <b>#line</b>.</li>
-
-    <li><b>The PDF is navigable.</b> Every section number in the text, the
-    index, or the contents page is a link, and starred sections become a PDF
-    outline nested by depth.</li>
-
-    <li><b>It documents itself.</b> GWEB is written in GWEB: only the Go needed
-    to bootstrap <b>gtangle</b> is committed, and the rest — including all of
-    <b>gweave</b> — is tangled from its own <b>.w</b> sources on the way to
-    building.</li>
-  </ul>
-</div>
-
-<h2 id="other-languages">Other languages</h2>
-<div class="body">
-  <p>A web can be written in Korean — or any language — by adding one line to
-  the <b>.w</b> file's limbo and typesetting with <b>luatex</b>:</p>
-<pre><span class="tex">\input kotexgweb</span></pre>
-  <p><b>gweave</b> needs no flag for this. Every piece of human-readable text
-  it emits goes through a macro — <b>\GU</b>, <b>\GNused</b>,
-  <b>\Gsectionword</b>, … — so an <b>\input</b> file that redefines them
-  localizes the whole document, headings, index, bookmarks and all.
-  <b>kotexgweb.tex</b> is the worked example: it loads
-  <a href="https://ctan.org/pkg/luatexko">luatexko</a>, selects the Noto
-  Serif/Sans CJK KR fonts, and supplies a LuaTeX PDF back end so links and the
-  bookmark pane work with Korean titles. Most of the recent examples below are
-  Korean essays.</p>
-</div>
-
-<h2 id="where-to-look">Where to look next</h2>
+<h2 id="works">Works</h2>
 <div class="body">
   <dl>
-    <dt><a href="https://github.com/sjnam/gweb">sjnam/gweb</a></dt>
-    <dd>The system itself, and the place for everything this page has left
-    out: how to install it, the full control-code reference
-    (<i>format.md</i>), the manual, change files, editor support, and the
-    <b>gweb</b>(1) man page for the two commands. MIT licensed.</dd>
+    <dt><a href="https://github.com/sjnam/gweb">gweb</a></dt>
+    <dd>The system itself, and the place for everything this page leaves out:
+    how to install it, the full control-code reference, the manual, change
+    files, editor support, and the <b>gweb</b>(1) man page for the two
+    commands. MIT licensed.</dd>
 
-    <dt><a href="https://github.com/sjnam/gweb-examples">sjnam/gweb-examples</a></dt>
+    <dt><a href="https://github.com/sjnam/gweb-examples">gweb-examples</a></dt>
     <dd>Thirty-odd literate Go programs, and the best answer to what GWEB is
     for. Algorithms and data structures (<b>ntt.w</b>, <b>ziptree.w</b>,
-    <b>suffixautomaton.w</b>), concurrency (<b>pipeline.w</b>,
-    <b>squint.w</b>, <b>fast_cancel.w</b>), and contest problems from
-    HackerRank, Codeforces, LeetCode, Library Checker and Project Euler — plus
-    two collections that walk one technique across several problems:
-    <b>cdq-dc/</b> (CDQ divide and conquer) and <b>cht/</b> (the convex hull
-    trick). Several carry MetaPost figures.</dd>
+    <b>suffixautomaton.w</b>), concurrency (<b>pipeline.w</b>, <b>squint.w</b>,
+    <b>fast_cancel.w</b>), and contest problems from HackerRank, Codeforces,
+    LeetCode, Library Checker and Project Euler — plus two collections that
+    walk one technique across several problems: <b>cdq-dc/</b> (CDQ divide and
+    conquer) and <b>cht/</b> (the convex hull trick). Many are Korean essays;
+    several carry MetaPost figures.</dd>
+
+    <dt><a href="https://github.com/sjnam/spider">spider</a></dt>
+    <dd>A faithful Go implementation of Knuth and Ruskey's constrained
+    Gray-sequence algorithms, and the bug report Knuth adopted into
+    <i>spiders.w</i>.</dd>
   </dl>
 
   <p>Longer programs written in GWEB, each its own repository:</p>
@@ -373,6 +364,16 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
   <p>Whichever you open, start with the PDF the <b>.w</b> weaves into.</p>
 </div>
 
+<h2 id="history">History</h2>
+<div class="body">
+  <p>Don Knuth wrote WEB for TeX and Pascal. Silvio Levy designed and developed
+  CWEB by adapting the WEB conventions to C; Knuth began using CWEB and made
+  further refinements. GWEB adapts those same conventions to Go —
+  <b>gtangle</b> is the analogue of <b>ctangle</b>(1), <b>gweave</b> of
+  <b>cweave</b>(1). If you have read a woven CWEB document, you already know
+  how to read a woven GWEB one.</p>
+</div>
+
 <h2 id="see-also">See also</h2>
 <div class="body">
   <p><b>gtangle</b>(1), <b>gweave</b>(1) — the command reference, installed
@@ -385,68 +386,14 @@ returned as a slice; as a lazy <span class="tex">|iter.Seq[int]|</span> they are
   Programming</i></a>, CSLI Lecture Notes 27 (1992).</p>
 </div>
 
-<h2 id="history">History</h2>
-<div class="body">
-  <p>Don Knuth wrote WEB for TeX and Pascal. Silvio Levy designed and developed
-  CWEB by adapting the WEB conventions to C; Knuth began using CWEB and made
-  further refinements. GWEB adapts those same conventions to Go.</p>
-</div>
-
-<h2 id="author">Author</h2>
-<div class="body">
-  <p><b>Soojin Nam</b> — <a href="https://github.com/sjnam">github.com/sjnam</a></p>
-
-  <p>Fond enough of literate programming to build a system for it. Go had no
-  WEB of its own, and doing without one seemed worse than writing one — so
-  GWEB exists, and nearly everything else linked from this page was written
-  with it.</p>
-
-  <p>A devoted reader of Donald Knuth, and the holder of several checks drawn
-  on the
-  <a href="https://www-cs-faculty.stanford.edu/~knuth/boss.html">Bank of San
-  Serriffe</a> — the reward Knuth sends to anyone who finds an error in his
-  work.</p>
-
-  <p>One of those errors was in <b>SPIDERS</b>, Knuth's implementation of the
-  constrained Gray-sequence algorithms of Knuth and Ruskey — <i>spider
-  squishing</i>, as the paper cheerfully calls it. The recurrences were wrong.
-  The corrected code now stands in
-  <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/spiders.w">spiders.w</a>,
-  where the credit reads:</p>
-
-  <blockquote>
-    <p>The code here is due to Soojin Nam, who kindly pointed out in 2026 that
-    my original recurrences were fatally flawed.</p>
-  </blockquote>
-
-  <p>Knuth's
-  <a href="https://www-cs-faculty.stanford.edu/~knuth/news.html">news page</a>
-  put it more warmly:</p>
-
-  <blockquote>
-    <p>However, my Korean friend Soojin Nam has just reported that the original
-    program contained a serious bug — which he discovered with the help of
-    Claude!</p>
-  </blockquote>
-
-  <p>The bug report, and a faithful Go implementation of the paper, are in
-  <a href="https://github.com/sjnam/spider">sjnam/spider</a>.</p>
-</div>
-
-<h2 id="copyright">Copyright</h2>
-<div class="body">
-  <p>GWEB is released under the
-  <a href="https://github.com/sjnam/gweb/blob/main/LICENSE">MIT License</a>.</p>
-</div>
-
 <div class="runhead bottom">
-  <span>GWEB</span><span>2026-07-21</span><span>GWEB(7)</span>
+  <span>SJNAM</span><span>2026-07-21</span><span>SJNAM(7)</span>
 </div>
 
 </main>
 
 <div class="status">
-  <span>Manual page gweb(7) line 1 (press h for help or q to quit)</span>
+  <span>Manual page sjnam(7) line 1 (press h for help or q to quit)</span>
   <span><span class="pct" id="pct">0%</span> · <button id="theme" type="button">invert</button></span>
 </div>
 
