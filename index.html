@@ -59,7 +59,31 @@
   }
   ::selection { background: var(--sel); }
 
-  main { max-width: 82ch; margin: 0 auto; }
+  main { max-width: 82ch; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* ── decorative margin rails (Gray-code spider art) ───────────── */
+  .rail {
+    position: fixed; top: 0; bottom: 0; z-index: 0;
+    width: 170px;
+    pointer-events: none;
+    background-repeat: repeat-y;
+    background-position: center top;
+    background-size: 100% auto;
+    opacity: 0.5;
+    /* fade the tiled seam out at the top and bottom edges */
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
+  }
+  .rail.left  { left: 0;  background-image: url("left.png"); }
+  .rail.right { right: 0; background-image: url("right.png"); }
+  /* the art is dark-on-black; on the light theme, invert to dark-on-cream */
+  @media (prefers-color-scheme: light) {
+    .rail { opacity: 0.4; filter: invert(1) hue-rotate(180deg); }
+  }
+  :root[data-theme="light"] .rail { opacity: 0.4; filter: invert(1) hue-rotate(180deg); }
+  :root[data-theme="dark"]  .rail { opacity: 0.5; filter: none; }
+  /* only when the viewport is wide enough to clear the centered column */
+  @media (max-width: 1200px) { .rail { display: none; } }
 
   /* ── the man(1) running head / foot ───────────────────────────── */
   .runhead {
@@ -158,6 +182,7 @@
     font-size: 0.85em; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
     display: flex; justify-content: space-between; gap: 1rem;
+    z-index: 10;
   }
   .status .pct { color: var(--bold); font-weight: 700; }
   .status button {
@@ -169,6 +194,9 @@
 </style>
 </head>
 <body>
+
+<div class="rail left" aria-hidden="true"></div>
+<div class="rail right" aria-hidden="true"></div>
 
 <main>
 
