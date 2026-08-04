@@ -7,7 +7,10 @@
 <meta name="description" content="Soojin Nam — literate programmer, author of GWEB, credited by Donald Knuth in spiders.w.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
 <style>
+  /* Dark is the default, regardless of the OS setting; the invert button
+     opts into light by stamping data-theme="light" on the root. */
   :root {
+    color-scheme: dark;
     --bg:        #0d0d0d;
     --fg:        #c8c8c8;
     --bold:      #ffffff;
@@ -19,26 +22,14 @@
     --sel:       #33475b;
     --statusbg:  #1c1c1c;
   }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg:       #f7f5ef;
-      --fg:       #232323;
-      --bold:     #000000;
-      --arg:      #8a5a10;
-      --link:     #1a5f8a;
-      --link-hov: #0d3f5e;
-      --dim:      #7a7a72;
-      --rule:     #ddd8cc;
-      --sel:      #cfe0ee;
-      --statusbg: #e6e2d7;
-    }
-  }
   :root[data-theme="light"] {
+    color-scheme: light;
     --bg:#f7f5ef; --fg:#232323; --bold:#000; --arg:#8a5a10;
     --link:#1a5f8a; --link-hov:#0d3f5e; --dim:#7a7a72; --rule:#ddd8cc;
     --sel:#cfe0ee; --statusbg:#e6e2d7;
   }
   :root[data-theme="dark"] {
+    color-scheme: dark;
     --bg:#0d0d0d; --fg:#c8c8c8; --bold:#fff; --arg:#d7a55b;
     --link:#6fb3d2; --link-hov:#9fd4ee; --dim:#6a6a6a; --rule:#2a2a2a;
     --sel:#33475b; --statusbg:#1c1c1c;
@@ -76,12 +67,9 @@
   }
   .rail.left  { left: 0;  background-image: url("left.png"); }
   .rail.right { right: 0; background-image: url("right.png"); }
-  /* the art is dark-on-black; on the light theme, invert to dark-on-cream */
-  @media (prefers-color-scheme: light) {
-    .rail { opacity: 0.4; filter: invert(1) hue-rotate(180deg); }
-  }
+  /* the art is white-on-black — as-is on the dark default; on the light
+     theme (opt-in), invert it to dark-on-cream */
   :root[data-theme="light"] .rail { opacity: 0.4; filter: invert(1) hue-rotate(180deg); }
-  :root[data-theme="dark"]  .rail { opacity: 0.5; filter: none; }
   /* only when the viewport is wide enough to clear the centered column */
   @media (max-width: 1200px) { .rail { display: none; } }
 
@@ -399,11 +387,9 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
   try { saved = localStorage.getItem('gweb-theme'); } catch (e) {}
   if (saved) root.setAttribute('data-theme', saved);
 
-  function prefersDark() {
-    return matchMedia('(prefers-color-scheme: dark)').matches;
-  }
+  // Dark is the default, so an unset theme is dark.
   btn.addEventListener('click', function () {
-    var cur = root.getAttribute('data-theme') || (prefersDark() ? 'dark' : 'light');
+    var cur = root.getAttribute('data-theme') || 'dark';
     var next = cur === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
     try { localStorage.setItem('gweb-theme', next); } catch (e) {}
