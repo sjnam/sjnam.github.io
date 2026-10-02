@@ -274,6 +274,10 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
   </table>
   </div>
 
+  <p><b>gtangle</b> is the analogue of <b>ctangle</b>(1), <b>gweave</b> of
+  <b>cweave</b>(1). If you have read a woven CWEB document, you already know
+  how to read a woven GWEB one.</p>
+
   <p>The program and the essay explaining it are not two artifacts kept in
   sync — they are one file. That is the whole of the idea; everything else is
   machinery in service of it.</p>
@@ -311,10 +315,14 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
     <dt><a href="https://github.com/sjnam/dancing-cells">dancing-cells</a></dt>
     <dd>Exact cover with multiplicities and colors, via sparse-set "dancing
     cells" and binary branching.</dd>
-    <dt><a href="https://github.com/sjnam/elliptic">elliptic</a></dt>
-    <dd>A traveller's notes on elliptic curves.</dd>
-    <dt><a href="https://github.com/sjnam/bohnanza">bohnanza</a></dt>
-    <dd>The bean-trading card game.</dd>
+    <dt><a href="https://github.com/sjnam/bdd">bdd</a></dt>
+    <dd>BDDs and ZDDs for Go, from Knuth's <i>BDD14</i> and <i>BDD15</i>.</dd>
+    <dt><a href="https://github.com/sjnam/sat">sat</a></dt>
+    <dd>Knuth's CDCL solver <i>SAT13</i>, with <i>SAT12</i> preprocessing, as a
+    Go package — mem counts identical to the C original.</dd>
+    <dt><a href="https://github.com/sjnam/mmix">mmix</a></dt>
+    <dd>Knuth's MMIXware — assembler, simulator, and pipeline meta-simulator —
+    translated whole.</dd>
     <dt><a href="https://github.com/sjnam/go-advent">go-advent</a></dt>
     <dd>Advent of Code, literately.</dd>
   </dl>
@@ -324,12 +332,25 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
 
 <h2 id="history">History</h2>
 <div class="body">
-  <p>Don Knuth wrote WEB for TeX and Pascal. Silvio Levy designed and developed
-  CWEB by adapting the WEB conventions to C; Knuth began using CWEB and made
-  further refinements. GWEB adapts those same conventions to Go —
-  <b>gtangle</b> is the analogue of <b>ctangle</b>(1), <b>gweave</b> of
-  <b>cweave</b>(1). If you have read a woven CWEB document, you already know
-  how to read a woven GWEB one.</p>
+  <p><b>sjnam</b> first appeared on GitHub in 2013, carrying samples of
+  Korean plain <a href="https://github.com/sjnam/TeX">TeX</a>.</p>
+
+  <p>From 2014 to 2021 it spoke mostly Lua — OpenResty and LuaJIT plumbing:
+  FFI bindings for <a href="https://github.com/sjnam/luajit-zstd">zstd</a>,
+  <a href="https://github.com/sjnam/luajit-brotli">brotli</a> and
+  <a href="https://github.com/sjnam/luajit-xxHash">xxHash</a>, a client for
+  <a href="https://github.com/sjnam/lua-resty-kyototycoon">KyotoTycoon</a>,
+  and <a href="https://github.com/sjnam/mpresty">mpresty</a>, a web
+  application that turns MetaPost, TikZ and Graphviz written inside an HTML
+  page into pictures. In 2021 came
+  <a href="https://github.com/sjnam/dlx">dlx</a>, Knuth's Algorithm 7.2.2.1M
+  in Go — the first program here taken from Knuth.</p>
+
+  <p>In 2026 the threads converged. <b>spider</b> found the bug in
+  <i>spiders.w</i>; <b>GWEB</b> was begun that same June, and everything
+  under WORKS followed. TeX and MetaPost, there from the start, became the
+  typesetting half of every <b>.w</b>, and mpresty was ported to Go as
+  <a href="https://github.com/sjnam/go-mpresty">go-mpresty</a>.</p>
 </div>
 
 <h2 id="contact">Contact</h2>
