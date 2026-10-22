@@ -7,20 +7,20 @@
 <meta name="description" content="Soojin Nam — literate programmer, author of GWEB, credited by Donald Knuth in spiders.w.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
 <style>
-  /* Dark is the default, regardless of the OS setting; the invert button
-     opts into light by stamping data-theme="light" on the root. */
+  /* Light is the default, regardless of the OS setting; the invert button
+     opts into dark by stamping data-theme="dark" on the root. */
   :root {
-    color-scheme: dark;
-    --bg:        #0d0d0d;
-    --fg:        #c8c8c8;
-    --bold:      #ffffff;
-    --arg:       #d7a55b;
-    --link:      #6fb3d2;
-    --link-hov:  #9fd4ee;
-    --dim:       #6a6a6a;
-    --rule:      #2a2a2a;
-    --sel:       #33475b;
-    --statusbg:  #1c1c1c;
+    color-scheme: light;
+    --bg:        #f7f5ef;
+    --fg:        #232323;
+    --bold:      #000000;
+    --arg:       #8a5a10;
+    --link:      #1a5f8a;
+    --link-hov:  #0d3f5e;
+    --dim:       #7a7a72;
+    --rule:      #ddd8cc;
+    --sel:       #cfe0ee;
+    --statusbg:  #e6e2d7;
   }
   :root[data-theme="light"] {
     color-scheme: light;
@@ -50,28 +50,7 @@
   }
   ::selection { background: var(--sel); }
 
-  main { max-width: 82ch; margin: 0 auto; position: relative; z-index: 1; }
-
-  /* ── decorative margin rails (Gray-code spider art) ───────────── */
-  .rail {
-    position: fixed; top: 0; bottom: 0; z-index: 0;
-    width: 170px;
-    pointer-events: none;
-    background-repeat: repeat-y;
-    background-position: center top;
-    background-size: 100% auto;
-    opacity: 0.5;
-    /* fade the tiled seam out at the top and bottom edges */
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
-    mask-image: linear-gradient(to bottom, transparent, #000 7%, #000 93%, transparent);
-  }
-  .rail.left  { left: 0;  background-image: url("left.png"); }
-  .rail.right { right: 0; background-image: url("right.png"); }
-  /* the art is white-on-black — as-is on the dark default; on the light
-     theme (opt-in), invert it to dark-on-cream */
-  :root[data-theme="light"] .rail { opacity: 0.4; filter: invert(1) hue-rotate(180deg); }
-  /* only when the viewport is wide enough to clear the centered column */
-  @media (max-width: 1200px) { .rail { display: none; } }
+  main { max-width: 82ch; margin: 0 auto; }
 
   /* ── the man(1) running head / foot ───────────────────────────── */
   .runhead {
@@ -182,9 +161,6 @@
 </style>
 </head>
 <body>
-
-<div class="rail left" aria-hidden="true"></div>
-<div class="rail right" aria-hidden="true"></div>
 
 <main>
 
@@ -398,9 +374,9 @@ foo.w  <span class="cmt">--[</span> <b>gweave</b>  <span class="cmt">]--&gt;</sp
   try { saved = localStorage.getItem('gweb-theme'); } catch (e) {}
   if (saved) root.setAttribute('data-theme', saved);
 
-  // Dark is the default, so an unset theme is dark.
+  // Light is the default, so an unset theme is light.
   btn.addEventListener('click', function () {
-    var cur = root.getAttribute('data-theme') || 'dark';
+    var cur = root.getAttribute('data-theme') || 'light';
     var next = cur === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
     try { localStorage.setItem('gweb-theme', next); } catch (e) {}
