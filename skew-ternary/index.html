@@ -1090,8 +1090,10 @@ function drawMini(rr) {
 
 /* ══════════ 평면 지도 목록 ══════════
    좌표가 없으니 Go 프로그램이 찍는 것을 그대로 보인다. 덧붙여 커누스의 짐작
-   α_k = α_0 ρ̂^k를 그 자리에서 셈해 본다. 꼭지 이름을 φ = ρ̂⁻¹로 k번 바꾸면
-   (아래 첨자를 4를 법으로 하나 내리되, 뿌리 변 ‘*’만은 올린다) α_0이 α_k가 되는지. */
+   α_k = ρ̂^k α_0 ρ̂^−k를 그 자리에서 셈해 본다. 꼭지 이름을 φ = ρ̂⁻¹로 k번 바꾸면
+   (아래 첨자를 4를 법으로 하나 내리되, 뿌리 변 ‘*’만은 올린다) α_0이 α_k가 되는지.
+   원본은 α_0 ρ̂^k라고 적었지만 그 곱은 짝수 꼭지를 홀수 꼭지로 보내므로 지도가 될 수
+   없다. 이름 바꾸기, 곧 켤레가 맞다(.w의 「돌려 보기」장). */
 
 const phi = p => pipEdge(p) === ROOT ? rot(p) : irot(p);
 
@@ -1200,14 +1202,16 @@ function drawMaps(r, kind) {
          Since even pips become odd pips, vertex cycles become face cycles — the four maps are
          alternately <b>dual</b> to each other (${a.v} vertices and ${a.f} faces, then ${b.v}
          vertices and ${b.f} faces). This is the identity
-         α<sub><i>k</i></sub>&nbsp;=&nbsp;α<sub>0</sub>ρ̂<sup><i>k</i></sup> that Knuth noticed by
-         hand and confirmed with this program. With ‘Overlay dual’ on, the green dotted dual on each
+         α<sub><i>k</i></sub>&nbsp;=&nbsp;ρ̂<sup><i>k</i></sup>α<sub>0</sub>ρ̂<sup>−<i>k</i></sup>
+         that Knuth noticed by hand and confirmed with this program. (He wrote
+         α<sub>0</sub>ρ̂<sup><i>k</i></sup>, but that product would send vertex pips to face pips;
+         the clones he listed are the renamings.) With ‘Overlay dual’ on, the green dotted dual on each
          card is precisely the map of the next conjugate.`
       : (dual.some(Boolean)
           ? `Only the conjugates marked ✓ arise from <i>T</i>’s map by applying φ <i>k</i> times.`
           : `No number of applications of φ yields the map of another conjugate (✗).`) +
-        ` Knuth found α<sub><i>k</i></sub>&nbsp;=&nbsp;α<sub>0</sub>ρ̂<sup><i>k</i></sup> for the
-         correspondence of Del Lungo et al.`);
+        ` Knuth found α<sub><i>k</i></sub>&nbsp;=&nbsp;ρ̂<sup><i>k</i></sup>α<sub>0</sub>ρ̂<sup>−<i>k</i></sup>
+         for the correspondence of Del Lungo et al.`);
 }
 
 /* ══════════ 움직이기 ══════════ */
