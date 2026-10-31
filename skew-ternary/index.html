@@ -1,211 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Skew Ternary Trees</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<meta name="description" content="Knuth's skew ternary trees, their four conjugates, and the planar maps they correspond to — an interactive companion to skew-ternary-calc.w.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📖</text></svg>">
 <style>
+/* 꾸밈은 sjnam.github.io의 홈페이지(man(1) 꼴)를 따른다. 밝은 화면이 기본이고,
+   아래 상태 줄의 invert가 data-theme="dark"를 찍는다. 저장 키 gweb-theme도
+   홈페이지와 같아서, 한쪽에서 바꾼 밝기가 다른 쪽에도 이어진다.
+   그림 코드가 쓰는 이름(--ink, --surface, --blue …)은 그 색들에 얹었다. */
 :root {
-  --paper:   #f4f4f8;
-  --surface: #ffffff;
-  --ink:     #191a22;
-  --muted:   #63657a;
-  --faint:   #8b8da0;
-  --rule:    #dedeea;
-  --blue:    #2b3fc4;   /* 싹 */
-  --red:     #bc372c;   /* 계급 */
-  --green:   #16794f;   /* 실 */
-  --blue-w:  #e6e8fb;
-  --shadow:  0 1px 2px rgba(25,26,34,.05), 0 8px 24px -16px rgba(25,26,34,.28);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper:   #131419;
-    --surface: #1b1c24;
-    --ink:     #e9e9f1;
-    --muted:   #9b9db0;
-    --faint:   #73758a;
-    --rule:    #2d2f3d;
-    --blue:    #92a6ff;
-    --red:     #ff8f80;
-    --green:   #58cf9c;
-    --blue-w:  #232741;
-    --shadow:  0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
-  }
+  color-scheme: light;
+  --bg:#f7f5ef; --fg:#232323; --bold:#000; --arg:#8a5a10;
+  --link:#1a5f8a; --link-hov:#0d3f5e; --dim:#7a7a72; --rule:#ddd8cc;
+  --sel:#cfe0ee; --statusbg:#e6e2d7;
+  --surface:#fcfbf7; --muted:#55554f;
+  --red:#a8382a; --green:#2f7a45; --blue-w:#e2ebf1;
 }
 :root[data-theme="dark"] {
-  --paper:   #131419;
-  --surface: #1b1c24;
-  --ink:     #e9e9f1;
-  --muted:   #9b9db0;
-  --faint:   #73758a;
-  --rule:    #2d2f3d;
-  --blue:    #92a6ff;
-  --red:     #ff8f80;
-  --green:   #58cf9c;
-  --blue-w:  #232741;
-  --shadow:  0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.8);
+  color-scheme: dark;
+  --bg:#0d0d0d; --fg:#c8c8c8; --bold:#fff; --arg:#d7a55b;
+  --link:#6fb3d2; --link-hov:#9fd4ee; --dim:#6a6a6a; --rule:#2a2a2a;
+  --sel:#33475b; --statusbg:#1c1c1c;
+  --surface:#141414; --muted:#9a9a94;
+  --red:#e2826f; --green:#79c38c; --blue-w:#18232b;
+}
+:root, :root[data-theme] {
+  --paper: var(--bg); --ink: var(--fg); --faint: var(--dim); --blue: var(--link);
 }
 
 * { box-sizing: border-box; }
+html { background: var(--bg); }
 body {
-  background: var(--paper);
-  color: var(--ink);
-  font-family: "Newsreader", Georgia, serif;
-  font-size: 17px;
-  line-height: 1.72;
   margin: 0;
-  padding-block: 3.5rem 4rem;
-  padding-left: 20px;
-  padding-right: 20px;
-  -webkit-font-smoothing: antialiased;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+               "DejaVu Sans Mono", "Liberation Mono", monospace;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 0 1.25rem 4.5rem;
+  -webkit-text-size-adjust: 100%;
 }
-.wrap { max-width: 940px; margin: 0 auto; display: flex; flex-direction: column; gap: 3.25rem; }
-.prose { max-width: 33em; }
-p { margin: 0 0 .9em; }
-p:last-child { margin-bottom: 0; }
-a { color: var(--blue); text-decoration-thickness: .5px; text-underline-offset: 2px; }
+::selection { background: var(--sel); }
 
-/* ── 머리 ── */
-.eyebrow {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
-  color: var(--faint); margin: 0 0 .9rem;
+/* 그림 넷이 들어가야 하므로 홈페이지(82ch)보다 조금 넓다 */
+main { max-width: 96ch; margin: 0 auto; }
+
+/* ── man(1)의 머리 줄과 꼬리 줄 ── */
+.runhead {
+  display: flex; justify-content: space-between; gap: 1rem;
+  color: var(--bold); font-weight: 700;
+  white-space: nowrap; overflow: hidden;
 }
-h1 {
-  font-weight: 400; font-size: clamp(2.1rem, 6vw, 3.2rem); line-height: 1.12;
-  margin: 0 0 .5rem; letter-spacing: -.015em; text-wrap: balance;
+.runhead span:nth-child(2) { font-weight: 400; color: var(--fg); }
+.runhead.top    { padding-top: 2.5rem; }
+.runhead.bottom { padding-top: 2rem; border-top: 1px solid var(--rule); margin-top: 2.5rem; }
+
+/* ── 절 ── */
+h2 {
+  font-size: 1em; font-weight: 700; color: var(--bold);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  margin: 2.1rem 0 0.55rem;
 }
-.deck { font-size: 1.08rem; color: var(--muted); max-width: 32em; margin: 0; }
-.theorem {
-  margin-top: 1.9rem; padding: 1rem 1.3rem; max-width: 34em;
-  border-left: 2px solid var(--red);
-  font-style: italic; color: var(--ink); background: var(--surface);
-  border-radius: 0 3px 3px 0; box-shadow: var(--shadow);
-}
-.theorem b { font-style: normal; font-weight: 500; }
+h2:first-of-type { margin-top: 1.4rem; }
+.body { padding-left: 7ch; }
+p { margin: 0 0 0.95rem; }
+.body > *:last-child { margin-bottom: 0; }
+b, strong { color: var(--bold); font-weight: 700; }
+/* man은 .I를 밑줄로 그린다 */
+i, em { color: var(--arg); font-style: normal; text-decoration: underline; text-underline-offset: 2px; }
+a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+a:hover, a:focus { color: var(--link-hov); }
+dl { margin: 0 0 0.95rem; }
+dt { color: var(--bold); font-weight: 700; margin-top: 0.7rem; }
+dt:first-child { margin-top: 0; }
+dd { margin: 0.1rem 0 0 7ch; }
+
+.theorem { margin: 0 0 0.95rem; padding: 0.55rem 0.9rem; border-left: 2px solid var(--rule); }
 
 /* ── 판 ── */
 figure { margin: 0; display: flex; flex-direction: column; gap: .85rem; }
-.plate-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
-h2 {
-  font-weight: 400; font-size: 1.32rem; margin: 0; letter-spacing: -.01em;
-}
-h2 .num {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
-  font-size: .68rem; letter-spacing: .14em; color: var(--faint);
-  display: block; text-transform: uppercase; margin-bottom: .15rem;
-}
+.plate-head { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; flex-wrap: wrap; }
 .plate {
-  background: var(--surface); border: 1px solid var(--rule); border-radius: 4px;
-  padding: 1.1rem 1.2rem; box-shadow: var(--shadow); overflow-x: auto;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 2px;
+  padding: 1rem 1.1rem; overflow-x: auto;
 }
-figcaption { font-size: .93rem; color: var(--muted); max-width: 40em; }
-figcaption b { color: var(--ink); font-weight: 500; }
-
+figcaption { color: var(--fg); }
 svg { display: block; width: 100%; height: auto; max-width: 100%; }
-svg text { fill: var(--ink); font-family: "Newsreader", Georgia, serif; }
+svg text { fill: var(--ink); font-family: inherit; }
 
 /* ── 조종 ── */
 .rail { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
-button, select, input[type=text] {
-  font: inherit; font-size: .9rem; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--rule);
-  border-radius: 3px; padding: .3rem .7rem; cursor: pointer;
-  transition: background .12s, border-color .12s;
+button, input[type=text] {
+  font: inherit; font-size: .93em; color: var(--link);
+  background: transparent; border: 1px solid var(--rule);
+  border-radius: 2px; padding: .15rem .65rem; cursor: pointer;
 }
-input[type=text] {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .82rem;
-  cursor: text; flex: 1 1 18rem; min-width: 0; letter-spacing: .02em;
-}
-button:hover, select:hover { border-color: var(--blue); }
-button:focus-visible, select:focus-visible, input:focus-visible, .seg button:focus-visible {
-  outline: 2px solid var(--blue); outline-offset: 1px;
-}
-.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
-.seg button { border: 0; border-radius: 0; padding: .3rem .75rem; }
+input[type=text] { color: var(--fg); cursor: text; flex: 1 1 18rem; min-width: 0; padding: .2rem .5rem; }
+button:hover { border-color: var(--link); color: var(--link-hov); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 2px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; }
 .seg button + button { border-left: 1px solid var(--rule); }
-.seg button[aria-pressed="true"] { background: var(--blue-w); color: var(--blue); }
-.err { color: var(--red); font-size: .88rem; min-height: 1.2em; }
+.seg button[aria-pressed="true"], #m-dual[aria-pressed="true"] { background: var(--sel); color: var(--bold); }
+.err { color: var(--red); min-height: 1.5em; margin: .4rem 0 0; }
 
 .transport { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
-.transport input[type=range] { flex: 1 1 12rem; min-width: 8rem; accent-color: var(--blue); cursor: pointer; }
-.readout {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .8rem;
-  color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap;
-}
-.readout em { font-style: normal; color: var(--ink); }
+.transport input[type=range] { flex: 1 1 12rem; min-width: 8rem; accent-color: var(--link); cursor: pointer; }
+.readout { color: var(--dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.readout em, .map .cnt em { color: var(--bold); text-decoration: none; }
 
 /* ── 쌓인 싹 ── */
 .stackbar { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; min-height: 2rem; }
-.stacklabel {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
-  letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
-}
+.stacklabel { color: var(--dim); }
 .chip {
-  font-size: .9rem; min-width: 1.9rem; text-align: center;
-  padding: .08rem .42rem; border-radius: 3px;
-  border: 1px solid var(--rule); color: var(--muted); background: transparent;
+  min-width: 2.2rem; text-align: center; padding: 0 .4rem; border-radius: 2px;
+  border: 1px solid var(--rule); color: var(--dim);
 }
-.chip.live { border-color: var(--blue); color: var(--blue); }
-.chip.free { border-color: var(--blue); color: var(--surface); background: var(--blue); font-weight: 500; }
-.chip .ov { text-decoration: overline; text-decoration-thickness: .06em; }
+.chip.live { border-color: var(--link); color: var(--link); }
+.chip.free { border-color: var(--link); color: var(--bg); background: var(--link); font-weight: 700; }
+.chip .ov { text-decoration: overline; }
 
 /* ── 켤레 ── */
 .conjrow { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
 .conj {
-  border: 1px solid var(--rule); border-radius: 4px; padding: .6rem .5rem .45rem;
-  background: none; cursor: pointer; display: flex; flex-direction: column; gap: .35rem;
-  align-items: center; text-align: center; transition: border-color .12s, background .12s;
+  border: 1px solid var(--rule); border-radius: 2px; padding: .6rem .5rem .45rem;
+  background: var(--surface); color: var(--fg); display: flex; flex-direction: column; gap: .35rem;
+  align-items: center; text-align: center;
 }
-.conj:hover { border-color: var(--blue); }
-.conj[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-w); }
-.conj .nm { font-size: 1.05rem; }
-.conj .bud {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
-  color: var(--faint); letter-spacing: .04em;
-}
-.conj[aria-pressed="true"] .bud { color: var(--blue); }
-.bud .ov, .readout .ov { text-decoration: overline; text-decoration-thickness: .06em; }
+.conj:hover { border-color: var(--link); }
+.conj[aria-pressed="true"] { border-color: var(--link); background: var(--blue-w); }
+.conj .bud { color: var(--dim); font-size: .9em; }
+.conj[aria-pressed="true"] .bud { color: var(--link); }
+.nm i { text-decoration: none; }
+.bud .ov, .readout .ov { text-decoration: overline; }
 .conj svg { width: 100%; height: auto; }
 
-.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: .82rem; color: var(--muted); }
-.legend span { display: inline-flex; align-items: center; gap: .35rem; }
-.swatch { width: .72rem; height: .72rem; border-radius: 2px; display: inline-block; }
+.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; color: var(--dim); }
+.legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.swatch { width: .7rem; height: .7rem; display: inline-block; text-decoration: none; }
 
-.args {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .8rem;
-  color: var(--muted); word-break: break-all; letter-spacing: .03em;
-}
+.args { color: var(--dim); word-break: break-all; }
 
 /* ── 평면 지도 ── */
 .maprow { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
 .map {
-  border: 1px solid var(--rule); border-radius: 4px; padding: .6rem .7rem .7rem;
+  border: 1px solid var(--rule); border-radius: 2px; padding: .6rem .7rem .7rem;
   background: var(--surface); min-width: 0;
 }
-.map.cur { border-color: var(--blue); }
-.map .nm { font-size: 1.05rem; display: flex; align-items: baseline; justify-content: space-between; }
+.map.cur { border-color: var(--link); }
+.map .nm { display: flex; align-items: baseline; justify-content: space-between; }
 .map .nm sup, .map .phi sup { line-height: 0; }
-.map .phi {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
-  color: var(--faint); letter-spacing: .04em;
-}
-.map .cnt { font-size: .8rem; line-height: 1.45; color: var(--faint); margin-bottom: .45rem; }
-.map .cnt em { font-style: normal; color: var(--ink); }
-.map h3 {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 400;
-  font-size: .62rem; letter-spacing: .12em; color: var(--faint);
-  margin: .5rem 0 .15rem;
-}
-.map ol {
-  list-style: none; margin: 0; padding: 0;
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .76rem; line-height: 1.6;
-}
-.map li { word-break: break-word; }
+.map .phi { color: var(--dim); font-size: .85em; }
+/* 두 줄로 접혀도 같은 줄 카드끼리 그림 높이가 맞도록 두 줄 높이를 늘 잡는다 */
+.map .cnt { font-size: .85em; line-height: 1.45; min-height: 2.9em; color: var(--dim); margin-bottom: .45rem; }
+.map h3 { font-weight: 700; font-size: .78em; letter-spacing: .06em; color: var(--dim); margin: .5rem 0 .15rem; }
+.map ol { list-style: none; margin: 0; padding: 0; font-size: .85em; line-height: 1.6; }
+.map li { word-break: break-word; cursor: default; border-radius: 2px; }
 .map li.v { border-left: 2px solid var(--red); padding-left: .4rem; }
 .map li.f { border-left: 2px solid var(--green); padding-left: .4rem; }
-.map sub { font-size: .7em; }
-.map .rt { color: var(--blue); }
+.map sub { font-size: .75em; }
+.map .rt { color: var(--link); }
+.map li.hl-v { background: color-mix(in srgb, var(--red) 14%, transparent); }
+.map li.hl-f { background: color-mix(in srgb, var(--green) 16%, transparent); }
 
 .map svg.mp { margin: .1rem 0 .3rem; overflow: visible; }
 .mp-f { fill: transparent; stroke: none; }
@@ -220,58 +180,65 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .mp-v { fill: var(--surface); stroke: var(--red); stroke-width: 1.5; cursor: default; }
 .mp-v.hl-v { fill: var(--red); }
 .mp-l {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 9px;
-  fill: var(--muted); stroke: var(--surface); stroke-width: 3; paint-order: stroke;
+  font-size: 9px; fill: var(--muted); stroke: var(--surface); stroke-width: 3; paint-order: stroke;
   text-anchor: middle; dominant-baseline: central; pointer-events: none;
 }
 .mp-l.hid { display: none; }
 .mp-l.hl-v, .mp-l.hl-f { display: inline; fill: var(--ink); }
 .mp-dual { display: none; }
 .maprow.dual .mp-dual { display: inline; }
-.mp-d {
-  fill: none; stroke: var(--green); stroke-width: 1.2; stroke-dasharray: 3 2.5;
-  stroke-linecap: round; pointer-events: none;
-}
+.mp-d { fill: none; stroke: var(--green); stroke-width: 1.2; stroke-dasharray: 3 2.5; stroke-linecap: round; pointer-events: none; }
 .mp-d.hl-f { stroke-width: 2.2; stroke-dasharray: none; }
 .mp-dv { fill: var(--surface); stroke: var(--green); stroke-width: 1.4; }
 .mp-dv.hl-f { fill: var(--green); }
-#m-dual[aria-pressed="true"] { background: var(--blue-w); color: var(--blue); border-color: var(--blue); }
-.map li { cursor: default; border-radius: 2px; }
-.map li.hl-v { background: color-mix(in srgb, var(--red) 12%, transparent); }
-.map li.hl-f { background: color-mix(in srgb, var(--green) 14%, transparent); }
 
-footer { border-top: 1px solid var(--rule); padding-top: 1.5rem; font-size: .92rem; color: var(--muted); }
-footer .prose { max-width: 36em; }
+/* ── less(1)의 상태 줄 ── */
+.status {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: var(--statusbg); color: var(--fg);
+  border-top: 1px solid var(--rule);
+  padding: 0.3rem 1rem;
+  font-size: 0.85em; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+  display: flex; justify-content: space-between; gap: 1rem;
+  z-index: 10;
+}
+.status .pct { color: var(--bold); font-weight: 700; }
+.status button {
+  background: none; border: none; color: var(--link);
+  font: inherit; cursor: pointer; padding: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.status button:hover { color: var(--link-hov); }
 
 @media (max-width: 620px) {
-  body { font-size: 16px; }
+  body { font-size: 14px; }
+  .body { padding-left: 2ch; }
+  dd { margin-left: 2ch; }
   .conjrow, .maprow { grid-template-columns: repeat(2, 1fr); }
-  .map .cnt { min-height: 2.9em; }   /* 두 줄로 접혀도 같은 줄 카드의 그림 높이가 맞게 */
-}
-@media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; }
 }
 </style>
+</head>
+<body>
 
-<div class="wrap">
+<main>
 
-<header>
-  <p class="eyebrow">skew-ternary-calc &nbsp;·&nbsp; D. E. Knuth, 2013</p>
-  <h1>Skew Ternary Trees</h1>
-  <p class="deck">Knuth apologized for having no time to give his program a better user
-  interface, and hoped someone would write an interactive “app” for playing with its trees and
-  graphs. Here is a first piece of one — Alice the ant’s walk, and the four conjugates it finds.</p>
-  <p class="theorem"><b>Theorem.</b> Every family of 2<i>n</i>+2 cyclically equivalent ternary
-  trees contains exactly four skew ternary trees.</p>
-</header>
+<div class="runhead top">
+  <span>SKEW-TERNARY(7)</span><span>Skew Ternary Trees</span><span>SKEW-TERNARY(7)</span>
+</div>
 
-<section class="prose">
-  <p>Put a <i>bud</i> in every empty slot of a ternary tree. The root node and the root bud
-  have rank 0, and the left, middle, and right children of a node of rank <i>r</i> have ranks
-  <i>r</i>−1, <i>r</i>, and <i>r</i>+1. The tree is <i>skew</i> if no node has negative rank.</p>
-</section>
+<h2 id="name">Name</h2>
+<div class="body">
+  <p><b>skew-ternary</b> — Knuth's skew ternary trees, their conjugates, and their planar
+  maps, to play with</p>
+</div>
 
-<div>
+<h2 id="synopsis">Synopsis</h2>
+<div class="body">
+  <p><b>skew-ternary</b> <i>abcd</i> ...</p>
+  <p>Each four-character argument <i>abcd</i> names a node <i>a</i> and its left, middle,
+  and right children <i>b</i>, <i>c</i>, <i>d</i>; write <b>-</b> for an empty child.
+  There is one argument per node, in any order.</p>
   <div class="rail">
     <input type="text" id="args" spellcheck="false" aria-label="Four-character arguments describing the tree">
     <button id="apply">Load</button>
@@ -281,9 +248,23 @@ footer .prose { max-width: 36em; }
   <p class="err" id="err"></p>
 </div>
 
-<figure>
+<h2 id="description">Description</h2>
+<div class="body">
+  <p>Knuth apologized for having no time to give his program a better user interface,
+  and hoped someone would write an interactive “app” for playing with its trees and
+  graphs. Here is a first piece of one — Alice the ant’s walk, and the four conjugates
+  it finds.</p>
+  <p class="theorem"><b>Theorem.</b> Every family of 2<i>n</i>+2 cyclically equivalent
+  ternary trees contains exactly four skew ternary trees.</p>
+  <p>Put a <i>bud</i> in every empty slot of a ternary tree. The root node and the root
+  bud have rank 0, and the left, middle, and right children of a node of rank <i>r</i>
+  have ranks <i>r</i>−1, <i>r</i>, and <i>r</i>+1. The tree is <i>skew</i> if no node
+  has negative rank.</p>
+</div>
+
+<h2 id="tree-buds">Figure 1 — The tree with its buds</h2>
+<figure class="body">
   <div class="plate-head">
-    <h2><span class="num">Figure 1</span>The tree with its buds</h2>
     <div class="seg" role="group" aria-label="Vertical axis">
       <button id="m-depth" aria-pressed="true">By depth</button>
       <button id="m-rank" aria-pressed="false">By rank</button>
@@ -298,10 +279,8 @@ footer .prose { max-width: 36em; }
   <figcaption id="cap1"></figcaption>
 </figure>
 
-<figure>
-  <div class="plate-head">
-    <h2><span class="num">Figure 2</span>Alice’s walk</h2>
-  </div>
+<h2 id="walk">Figure 2 — Alice’s walk</h2>
+<figure class="body">
   <div class="plate"><svg id="chart" role="img" aria-label="Alice’s state chart"></svg></div>
   <div class="transport">
     <button id="play" aria-label="Play">▶ Play</button>
@@ -317,49 +296,63 @@ footer .prose { max-width: 36em; }
   <figcaption id="cap2"></figcaption>
 </figure>
 
-<figure>
-  <div class="plate-head">
-    <h2><span class="num">Figure 3</span>The four conjugates</h2>
-  </div>
+<h2 id="conjugates">Figure 3 — The four conjugates</h2>
+<figure class="body">
   <div class="conjrow" id="conjrow"></div>
   <p class="args" id="curargs"></p>
   <figcaption>Hang the tree from each of the four unmatched buds in turn, and you get
   <i>T</i>, <i>T</i><sup>+</sup>, <i>T</i><sup>++</sup>, and <i>T</i><sup>+++</sup>, with
-  <i>T</i><sup>++++</sup>&nbsp;=&nbsp;<i>T</i>. Click one to move to that tree — the shape stays
-  the same and only the bud it hangs from changes, so the buds are renumbered from the new root.</figcaption>
+  <i>T</i><sup>++++</sup>&nbsp;=&nbsp;<i>T</i>. Click one to move to that tree — the shape
+  stays the same and only the bud it hangs from changes, so the buds are renumbered from the
+  new root.</figcaption>
 </figure>
 
-<figure>
+<h2 id="maps">Figure 4 — Planar maps</h2>
+<figure class="body">
   <div class="plate-head">
-    <h2><span class="num">Figure 4</span>Planar maps</h2>
-    <div class="rail">
-      <button id="m-dual" aria-pressed="false">Overlay dual</button>
-      <div class="seg" role="group" aria-label="Correspondence">
-        <button id="m-ddp" aria-pressed="true">Del Lungo et al.</button>
-        <button id="m-js" aria-pressed="false">Jacquard–Schaeffer</button>
-      </div>
+    <button id="m-dual" aria-pressed="false">Overlay dual</button>
+    <div class="seg" role="group" aria-label="Correspondence">
+      <button id="m-ddp" aria-pressed="true">Del Lungo et al.</button>
+      <button id="m-js" aria-pressed="false">Jacquard–Schaeffer</button>
     </div>
   </div>
   <div class="maprow" id="maprow"></div>
   <figcaption id="cap4"></figcaption>
 </figure>
 
-<footer>
-  <div class="prose">
-    <p>The computations are a direct translation of Knuth’s
-    <span class="args" style="display:inline">skew-ternary-calc.w</span>: the chapters that parse
-    the tree and build the state chart, and the four chapters that turn a tree into a planar map
-    (from the quad-edge data structure through the correspondence of Del Lungo et al.). On more
-    than 8,900 distinct random trees they reproduce the program’s entire output character for
-    character. The drawings of the maps are not part of the original, which prints only lists of
-    vertices, edges, and faces. Here each map’s barycentric subdivision is built, the boundary of
-    the outer face is pinned to a circle, and every interior node is placed at the average of its
-    neighbors (Tutte); then the nodes are spread apart and the edges straightened, never letting a
-    triangle of the subdivision flip over. The drawings are guaranteed to be free of crossings and
-    stay readable up to about twenty nodes.</p>
-  </div>
-</footer>
+<h2 id="notes">Notes</h2>
+<div class="body">
+  <p>The computations are a direct translation of Knuth’s <b>skew-ternary-calc.w</b>: the
+  chapters that parse the tree and build the state chart, and the four chapters that turn a
+  tree into a planar map (from the quad-edge data structure through the correspondence of
+  Del Lungo et al.). On more than 8,900 distinct random trees they reproduce the program’s
+  entire output character for character.</p>
+  <p>The drawings of the maps are not part of the original, which prints only lists of
+  vertices, edges, and faces. Here each map’s barycentric subdivision is built, the boundary
+  of the outer face is pinned to a circle, and every interior node is placed at the average
+  of its neighbors (Tutte); then the nodes are spread apart and the edges straightened,
+  never letting a triangle of the subdivision flip over. The drawings are guaranteed to be
+  free of crossings and stay readable up to about twenty nodes.</p>
+</div>
 
+<h2 id="see-also">See also</h2>
+<div class="body">
+  <p><a href="https://sjnam.github.io/"><b>sjnam</b>(7)</a> — the home page this one hangs from.</p>
+  <p>D. E. Knuth, <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/skew-ternary-calc.w"><b>skew-ternary-calc.w</b></a>
+  (2013) — the original CWEB program.</p>
+  <p><a href="https://github.com/sjnam/gweb-examples/tree/main/skew-ternary"><b>gweb-examples/skew-ternary</b></a>
+  — the GWEB port in Korean and Go, and the source of this page.</p>
+</div>
+
+<div class="runhead bottom">
+  <span>SJNAM</span><span>2026-11-01</span><span>SKEW-TERNARY(7)</span>
+</div>
+
+</main>
+
+<div class="status">
+  <span>Manual page skew-ternary(7) line 1 (press h for help or q to quit)</span>
+  <span><span class="pct" id="pct">0%</span> · <button id="theme" type="button">invert</button></span>
 </div>
 
 <script>
@@ -1372,3 +1365,41 @@ document.addEventListener("keydown", e => {
 
 load(KNUTH.slice(), false);
 </script>
+
+<script>
+/* 상태 줄: 읽은 비율, invert, q — sjnam.github.io의 홈페이지와 같다 */
+(function () {
+  var pct = document.getElementById('pct');
+  function update() {
+    var h = document.documentElement;
+    var max = h.scrollHeight - h.clientHeight;
+    var p = max > 0 ? Math.round(h.scrollTop / max * 100) : 100;
+    pct.textContent = p >= 100 ? 'END' : p + '%';
+  }
+  addEventListener('scroll', update, { passive: true });
+  addEventListener('resize', update);
+  update();
+
+  var btn = document.getElementById('theme');
+  var root = document.documentElement;
+  var saved = null;
+  try { saved = localStorage.getItem('gweb-theme'); } catch (e) {}
+  if (saved) root.setAttribute('data-theme', saved);
+  btn.addEventListener('click', function () {
+    var cur = root.getAttribute('data-theme') || 'light';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('gweb-theme', next); } catch (e) {}
+  });
+
+  addEventListener('keydown', function (e) {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'q' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
