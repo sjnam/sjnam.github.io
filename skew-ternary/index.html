@@ -1,10 +1,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Skew Ternary Trees</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root {
+  /* 글꼴도 홈페이지를 따른다. 홈페이지는 시스템 고정폭(맥에서는 SF Mono)이고,
+     본문은 같은 집안의 시스템 산세리프(맥에서는 SF Pro)로 쓴다. */
+  --sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas,
+          "DejaVu Sans Mono", "Liberation Mono", monospace;
   --paper:   #f7f5ef;   /* 바탕과 무채색은 sjnam.github.io 홈페이지를 따른다 */
   --surface: #fcfbf7;
   --ink:     #232323;
@@ -37,9 +41,9 @@
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: "Newsreader", Georgia, serif;
-  font-size: 17px;
-  line-height: 1.72;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
   margin: 0;
   padding-block: 3.5rem 4rem;
   padding-left: 20px;
@@ -54,7 +58,7 @@ a { color: var(--blue); text-decoration-thickness: .5px; text-underline-offset: 
 
 /* ── 머리 ── */
 .eyebrow {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: var(--mono);
   font-size: .68rem; letter-spacing: .16em; text-transform: uppercase;
   color: var(--faint); margin: 0 0 .9rem;
 }
@@ -78,7 +82,7 @@ h2 {
   font-weight: 400; font-size: 1.32rem; margin: 0; letter-spacing: -.01em;
 }
 h2 .num {
-  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-family: var(--mono);
   font-size: .68rem; letter-spacing: .14em; color: var(--faint);
   display: block; text-transform: uppercase; margin-bottom: .15rem;
 }
@@ -90,7 +94,7 @@ figcaption { font-size: .93rem; color: var(--muted); max-width: 40em; }
 figcaption b { color: var(--ink); font-weight: 500; }
 
 svg { display: block; width: 100%; height: auto; max-width: 100%; }
-svg text { fill: var(--ink); font-family: "Newsreader", Georgia, serif; }
+svg text { fill: var(--ink); font-family: var(--sans); }
 
 /* ── 조종 ── */
 .rail { display: flex; align-items: center; gap: .55rem; flex-wrap: wrap; }
@@ -101,7 +105,7 @@ button, select, input[type=text] {
   transition: background .12s, border-color .12s;
 }
 input[type=text] {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .82rem;
+  font-family: var(--mono); font-size: .82rem;
   cursor: text; flex: 1 1 18rem; min-width: 0; letter-spacing: .02em;
 }
 button:hover, select:hover { border-color: var(--blue); }
@@ -117,7 +121,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .transport { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; }
 .transport input[type=range] { flex: 1 1 12rem; min-width: 8rem; accent-color: var(--blue); cursor: pointer; }
 .readout {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .8rem;
+  font-family: var(--mono); font-size: .8rem;
   color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .readout em { font-style: normal; color: var(--ink); }
@@ -125,7 +129,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 /* ── 쌓인 싹 ── */
 .stackbar { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; min-height: 2rem; }
 .stacklabel {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
+  font-family: var(--mono); font-size: .68rem;
   letter-spacing: .12em; text-transform: uppercase; color: var(--faint);
 }
 .chip {
@@ -148,7 +152,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .conj[aria-pressed="true"] { border-color: var(--blue); background: var(--blue-w); }
 .conj .nm { font-size: 1.05rem; }
 .conj .bud {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
+  font-family: var(--mono); font-size: .68rem;
   color: var(--faint); letter-spacing: .04em;
 }
 .conj[aria-pressed="true"] .bud { color: var(--blue); }
@@ -160,7 +164,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .swatch { width: .72rem; height: .72rem; border-radius: 2px; display: inline-block; }
 
 .args {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .8rem;
+  font-family: var(--mono); font-size: .8rem;
   color: var(--muted); word-break: break-all; letter-spacing: .03em;
 }
 
@@ -174,19 +178,19 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .map .nm { font-size: 1.05rem; display: flex; align-items: baseline; justify-content: space-between; }
 .map .nm sup, .map .phi sup { line-height: 0; }
 .map .phi {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .68rem;
+  font-family: var(--mono); font-size: .68rem;
   color: var(--faint); letter-spacing: .04em;
 }
 .map .cnt { font-size: .8rem; line-height: 1.45; color: var(--faint); margin-bottom: .45rem; }
 .map .cnt em { font-style: normal; color: var(--ink); }
 .map h3 {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 400;
+  font-family: var(--mono); font-weight: 400;
   font-size: .62rem; letter-spacing: .12em; color: var(--faint);
   margin: .5rem 0 .15rem;
 }
 .map ol {
   list-style: none; margin: 0; padding: 0;
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .76rem; line-height: 1.6;
+  font-family: var(--mono); font-size: .76rem; line-height: 1.6;
 }
 .map li { word-break: break-word; }
 .map li.v { border-left: 2px solid var(--red); padding-left: .4rem; }
@@ -207,7 +211,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
 .mp-v { fill: var(--surface); stroke: var(--red); stroke-width: 1.5; cursor: default; }
 .mp-v.hl-v { fill: var(--red); }
 .mp-l {
-  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 9px;
+  font-family: var(--mono); font-size: 9px;
   fill: var(--muted); stroke: var(--surface); stroke-width: 3; paint-order: stroke;
   text-anchor: middle; dominant-baseline: central; pointer-events: none;
 }
