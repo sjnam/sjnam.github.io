@@ -167,6 +167,7 @@ button:focus-visible, select:focus-visible, input:focus-visible, .seg button:foc
   font-family: var(--mono); font-size: .8rem;
   color: var(--muted); word-break: break-all; letter-spacing: .03em;
 }
+a .args { color: inherit; }
 
 /* ── 평면 지도 ── */
 .maprow { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
@@ -342,7 +343,7 @@ try { if (localStorage.getItem("gweb-theme") === "dark") document.documentElemen
 <footer>
   <div class="prose">
     <p>The computations are a direct translation of Knuth’s
-    <span class="args" style="display:inline">skew-ternary-calc.w</span>: the chapters that parse
+    <a href="https://www-cs-faculty.stanford.edu/~knuth/programs/skew-ternary-calc.w"><span class="args" style="display:inline">skew-ternary-calc.w</span></a>: the chapters that parse
     the tree and build the state chart, and the four chapters that turn a tree into a planar map
     (from the quad-edge data structure through the correspondence of Del Lungo et al.). On more
     than 8,900 distinct random trees they reproduce the program’s entire output character for
